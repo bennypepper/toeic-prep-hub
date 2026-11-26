@@ -4,32 +4,89 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>TOEIC Listening &amp; Reading Mock Exams</title>
+<script>
+(function() {
+  try {
+    var savedTheme = localStorage.getItem("toeic_hub_theme");
+    var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  } catch (e) {}
+})();
+</script>
 <style>
   :root {
+    color-scheme: light;
     --bg: #f6f5f1;
     --surface: #ffffff;
     --surface-muted: #f0eee8;
     --surface-subtle: #faf9f6;
+    --header-bg: rgba(255, 255, 255, 0.95);
     --ink: #1a1917;
+    --ink-passage: #22201d;
     --ink-secondary: #5c5952;
-    --ink-tertiary: #87837a;
+    --ink-tertiary: #76726a;
     --border: #e3e0d8;
     --border-strong: #ccc8bd;
     --accent: #1f2d3d;
     --accent-hover: #131d28;
+    --accent-ink: #ffffff;
     --accent-tint: #eef1f5;
+    --accent-border: #b7c3d1;
+    --accent-text: #1f2d3d;
+    --sign-bg: #fcfaf4;
+    --sign-border: #d6c8a8;
     --highlight: #9a6b24;
     --highlight-bg: #fbf6eb;
     --highlight-border: #dfbe80;
     --ok: #266346;
+    --ok-hover: #1d4e37;
     --ok-bg: #eef7f1;
     --ok-border: #b8dfc6;
+    --ok-ink: #194530;
     --bad: #9e2a2b;
     --bad-bg: #fdf1f1;
     --bad-border: #eababa;
+    --bad-ink: #6b1d1e;
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #141413;
+    --surface: #1d1c1a;
+    --surface-muted: #292724;
+    --surface-subtle: #181715;
+    --header-bg: rgba(24, 23, 21, 0.94);
+    --ink: #ece9e2;
+    --ink-passage: #e4e0d8;
+    --ink-secondary: #b6b1a6;
+    --ink-tertiary: #948f84;
+    --border: #302e2a;
+    --border-strong: #48453f;
+    --accent: #314d69;
+    --accent-hover: #3d5f80;
+    --accent-ink: #f4f7fa;
+    --accent-tint: #202c38;
+    --accent-border: #3d546b;
+    --accent-text: #bfd6ee;
+    --sign-bg: #232018;
+    --sign-border: #5c4e32;
+    --highlight: #e5b769;
+    --highlight-bg: #2b2315;
+    --highlight-border: #6e5428;
+    --ok: #2d7a55;
+    --ok-hover: #368f64;
+    --ok-bg: #162920;
+    --ok-border: #2e5d45;
+    --ok-ink: #9ee0be;
+    --bad: #b53a3b;
+    --bad-bg: #2c191a;
+    --bad-border: #6f3537;
+    --bad-ink: #f3b3b3;
   }
 
   * { box-sizing: border-box; }
@@ -40,13 +97,14 @@
     color: var(--ink);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.18s ease, color 0.18s ease;
   }
 
   header {
     position: sticky;
     top: 0;
     z-index: 40;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--header-bg);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border);
   }
@@ -70,7 +128,57 @@
   .brand-title { font-weight: 600; font-size: 0.98rem; letter-spacing: -0.01em; color: var(--ink); }
   .brand-sub { font-size: 0.82rem; color: var(--ink-tertiary); }
 
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
   .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .global-toggles {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 8px;
+    border-left: 1px solid var(--border);
+  }
+  @media (max-width: 640px) {
+    .global-toggles { padding-left: 0; border-left: none; }
+  }
+
+  .lang-switch {
+    display: inline-flex;
+    align-items: center;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    padding: 2px;
+  }
+  .lang-btn {
+    border: none;
+    background: transparent;
+    color: var(--ink-secondary);
+    padding: 4px 8px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    border-radius: 5px;
+    letter-spacing: 0.03em;
+  }
+  .lang-btn:hover:not(.active) { color: var(--ink); }
+  .lang-btn.active {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .theme-btn {
+    padding: 6px 9px;
+    background: var(--surface);
+    color: var(--ink-secondary);
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+  }
+  .theme-btn:hover { background: var(--surface-muted); color: var(--ink); }
+
   .stat-chip {
     display: inline-flex;
     align-items: center;
@@ -86,8 +194,8 @@
   .stat-chip strong { color: var(--ink); font-weight: 600; }
   .stat-chip.warn { background: var(--highlight-bg); border-color: var(--highlight-border); color: var(--highlight); }
   .stat-chip.warn strong { color: var(--highlight); }
-  .stat-chip.danger { background: var(--bad-bg); border-color: var(--bad-border); color: var(--bad); }
-  .stat-chip.danger strong { color: var(--bad); }
+  .stat-chip.danger { background: var(--bad-bg); border-color: var(--bad-border); color: var(--bad-ink); }
+  .stat-chip.danger strong { color: var(--bad-ink); }
 
   select.control-select {
     font-family: inherit;
@@ -115,16 +223,14 @@
     transition: background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease;
   }
   button:disabled { opacity: 0.45; cursor: not-allowed; }
-  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
   .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
   .btn-ghost { background: var(--surface); color: var(--ink); border-color: var(--border-strong); }
   .btn-ghost:hover:not(:disabled) { background: var(--surface-muted); }
   .btn-subtle { background: transparent; color: var(--ink-secondary); border-color: transparent; padding: 6px 10px; }
   .btn-subtle:hover:not(:disabled) { background: var(--surface-muted); color: var(--ink); }
-  .btn-submit { background: var(--ok); color: #fff; }
-  .btn-submit:hover:not(:disabled) { background: #1d4e37; }
-  .btn-danger-ghost { background: var(--surface); color: var(--bad); border-color: var(--bad-border); }
-  .btn-danger-ghost:hover:not(:disabled) { background: var(--bad-bg); }
+  .btn-submit { background: var(--ok); color: #ffffff; }
+  .btn-submit:hover:not(:disabled) { background: var(--ok-hover); }
 
   /* Homepage */
   .home-wrap {
@@ -132,9 +238,7 @@
     margin: 36px auto 72px;
     padding: 0 20px;
   }
-  .home-hero {
-    margin-bottom: 26px;
-  }
+  .home-hero { margin-bottom: 26px; }
   .kicker {
     font-size: 0.74rem;
     font-weight: 600;
@@ -192,6 +296,7 @@
     justify-content: space-between;
     gap: 12px;
     margin: 0 0 14px;
+    flex-wrap: wrap;
   }
   .section-heading h2 {
     margin: 0;
@@ -200,16 +305,9 @@
     color: var(--ink);
     letter-spacing: -0.01em;
   }
-  .section-heading span {
-    font-size: 0.8rem;
-    color: var(--ink-tertiary);
-  }
+  .section-heading span { font-size: 0.8rem; color: var(--ink-tertiary); }
 
-  .exam-list {
-    display: grid;
-    gap: 14px;
-    margin-bottom: 28px;
-  }
+  .exam-list { display: grid; gap: 14px; margin-bottom: 28px; }
   .exam-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -259,13 +357,9 @@
   .status-pill.done {
     background: var(--ok-bg);
     border-color: var(--ok-border);
-    color: var(--ok);
+    color: var(--ok-ink);
   }
-  .exam-meta {
-    font-size: 0.85rem;
-    color: var(--ink-secondary);
-    margin: 0 0 12px;
-  }
+  .exam-meta { font-size: 0.85rem; color: var(--ink-secondary); margin: 0 0 12px; }
   .exam-specs {
     display: flex;
     flex-wrap: wrap;
@@ -288,6 +382,7 @@
     color: var(--ink-secondary);
     margin-bottom: 6px;
     font-variant-numeric: tabular-nums;
+    flex-wrap: wrap;
   }
   .progress-row strong { color: var(--ink); }
   .progress-track {
@@ -375,6 +470,14 @@
     font-size: 0.83rem;
     color: var(--ink-secondary);
   }
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--surface-muted);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--ink);
+  }
 
   /* Setup / Start Screen */
   .start-screen {
@@ -396,7 +499,7 @@
 
   .resume-banner {
     background: var(--accent-tint);
-    border: 1px solid #cdd6e0;
+    border: 1px solid var(--accent-border);
     border-radius: 9px;
     padding: 14px 16px;
     margin-bottom: 20px;
@@ -406,6 +509,7 @@
     gap: 12px;
     flex-wrap: wrap;
     font-size: 0.88rem;
+    color: var(--ink);
   }
   .mode-box {
     background: var(--surface-subtle);
@@ -556,6 +660,9 @@
     display: block;
     margin: 0 auto;
   }
+  [data-theme="dark"] .photo-wrap img {
+    filter: brightness(0.92) contrast(1.03);
+  }
 
   .graphic-box {
     border: 1px solid var(--border-strong);
@@ -565,12 +672,12 @@
     background: var(--surface-subtle);
     max-width: 480px;
   }
-  .graphic-title { font-weight: 600; text-align: center; margin-bottom: 10px; font-size: 0.92rem; }
-  .sign-box { text-align: center; background: #fcfaf4; border-color: #d6c8a8; }
+  .graphic-title { font-weight: 600; text-align: center; margin-bottom: 10px; font-size: 0.92rem; color: var(--ink); }
+  .sign-box { text-align: center; background: var(--sign-bg); border-color: var(--sign-border); }
   .sign-heading { font-weight: 700; font-size: 1.02rem; margin-bottom: 6px; color: var(--ink); }
   .events-list { margin: 8px 0 0; padding-left: 18px; font-size: 0.88rem; line-height: 1.65; }
 
-  .toeic-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .toeic-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; color: var(--ink); }
   .toeic-table th, .toeic-table td { border: 1px solid var(--border); padding: 8px 11px; text-align: left; }
   .toeic-table th { background: var(--surface-subtle); font-weight: 600; color: var(--ink); }
 
@@ -582,8 +689,8 @@
     margin-bottom: 16px;
     font-family: var(--font-serif);
     font-size: 0.97rem;
-    line-height: 1.7;
-    color: #22201d;
+    line-height: 1.72;
+    color: var(--ink-passage);
   }
   .doc-card p:first-child { margin-top: 0; }
   .doc-card p:last-child { margin-bottom: 0; }
@@ -625,9 +732,10 @@
     font-size: 0.9rem;
     line-height: 1.5;
     border: 1px solid var(--border);
+    color: var(--ink);
   }
   .chat-msg.left { align-self: flex-start; background: var(--surface); }
-  .chat-msg.right { align-self: flex-end; background: var(--accent-tint); border-color: #d6dde6; }
+  .chat-msg.right { align-self: flex-end; background: var(--accent-tint); border-color: var(--accent-border); }
   .chat-meta { font-size: 0.74rem; font-weight: 600; color: var(--ink-tertiary); margin-bottom: 2px; }
 
   .question-block { padding: 18px 0; border-top: 1px solid var(--border); }
@@ -681,14 +789,14 @@
     background: var(--surface);
     transition: all 0.12s ease;
   }
-  .opt.selected { border-color: var(--accent); background: var(--accent-tint); }
-  .opt.selected .opt-letter { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .opt.selected { border-color: var(--accent-border); background: var(--accent-tint); }
+  .opt.selected .opt-letter { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
   .opt.speaking { border-color: var(--highlight-border); background: var(--highlight-bg); }
   .opt.speaking .opt-letter { border-color: var(--highlight); color: var(--highlight); }
   .opt.correct { border-color: var(--ok-border); background: var(--ok-bg); }
-  .opt.correct .opt-letter { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .opt.correct .opt-letter { background: var(--ok); border-color: var(--ok); color: #ffffff; }
   .opt.wrong { border-color: var(--bad-border); background: var(--bad-bg); }
-  .opt.wrong .opt-letter { background: var(--bad); border-color: var(--bad); color: #fff; }
+  .opt.wrong .opt-letter { background: var(--bad); border-color: var(--bad); color: #ffffff; }
 
   .audio-hint { font-size: 0.81rem; color: var(--ink-tertiary); margin-top: 10px; }
 
@@ -699,9 +807,9 @@
     font-size: 0.87rem;
     background: var(--ok-bg);
     border: 1px solid var(--ok-border);
-    color: #194530;
+    color: var(--ok-ink);
   }
-  .explanation-box.missed { background: var(--bad-bg); border-color: var(--bad-border); color: #6b1d1e; }
+  .explanation-box.missed { background: var(--bad-bg); border-color: var(--bad-border); color: var(--bad-ink); }
   .transcript-box {
     margin-top: 18px;
     background: var(--surface-subtle);
@@ -748,10 +856,10 @@
     transition: all 0.1s ease;
   }
   .nav-dot:hover { border-color: var(--border-strong); color: var(--ink); }
-  .nav-dot.answered { background: var(--accent-tint); border-color: #b7c3d1; color: var(--accent); font-weight: 600; }
+  .nav-dot.answered { background: var(--accent-tint); border-color: var(--accent-border); color: var(--accent-text); font-weight: 600; }
   .nav-dot.current { border-color: var(--ink); color: var(--ink); font-weight: 700; box-shadow: inset 0 0 0 1px var(--ink); }
-  .nav-dot.ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok); font-weight: 600; }
-  .nav-dot.bad { background: var(--bad-bg); border-color: var(--bad-border); color: var(--bad); font-weight: 600; }
+  .nav-dot.ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok-ink); font-weight: 600; }
+  .nav-dot.bad { background: var(--bad-bg); border-color: var(--bad-border); color: var(--bad-ink); font-weight: 600; }
 
   .pace-notes {
     margin-top: 14px;
@@ -816,44 +924,48 @@
 <header>
   <div class="header-inner">
     <div class="brand-wrap">
-      <button id="homeBackBtn" class="btn-ghost hidden" onclick="goHome()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        All Exams
-      </button>
+      <button id="homeBackBtn" class="btn-ghost hidden" onclick="goHome()"></button>
       <div class="brand">
         <span class="brand-title" id="headerTitle">TOEIC Mock Exam Hub</span>
         <span class="brand-sub" id="headerSub">3 Practice Exams · 500 Questions</span>
       </div>
     </div>
 
-    <div class="controls hidden" id="examControls">
-      <div class="stat-chip" id="timerPill">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <strong id="timerDisplay">120:00</strong>
+    <div class="header-right">
+      <div class="controls hidden" id="examControls">
+        <div class="stat-chip" id="timerPill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <strong id="timerDisplay">120:00</strong>
+        </div>
+        <div class="stat-chip">
+          <span id="answeredLabel">Answered</span> <strong id="answeredCount">0</strong> / <span id="totalQCount">200</span>
+        </div>
+        <select id="speedSelect" class="control-select" onchange="onSpeedChange()">
+          <option value="0.9">0.9x</option>
+          <option value="1.0" selected>1.0x</option>
+          <option value="1.1">1.1x</option>
+        </select>
+        <button class="btn-ghost" id="modeToggleBtn" onclick="toggleMode()">Exam Mode</button>
+        <button class="btn-ghost" id="pauseBtn" onclick="toggleTimer()" disabled>Pause Timer</button>
+        <button class="btn-submit" id="submitBtn" onclick="confirmSubmit()" disabled>Submit</button>
       </div>
-      <div class="stat-chip">
-        Answered <strong id="answeredCount">0</strong> / <span id="totalQCount">200</span>
-      </div>
-      <select id="speedSelect" class="control-select" title="Audio Playback Speed" onchange="onSpeedChange()">
-        <option value="0.9">0.9x speed</option>
-        <option value="1.0" selected>1.0x speed</option>
-        <option value="1.1">1.1x speed</option>
-      </select>
-      <button class="btn-ghost" id="modeToggleBtn" onclick="toggleMode()" title="Switch between Exam and Practice mode">Exam Mode</button>
-      <button class="btn-ghost" id="pauseBtn" onclick="toggleTimer()" disabled>Pause Timer</button>
-      <button class="btn-submit" id="submitBtn" onclick="confirmSubmit()" disabled>Submit</button>
-    </div>
 
-    <div class="controls" id="homeControls">
-      <select id="homeSpeedSelect" class="control-select" title="Default Audio Speed" onchange="syncSpeedFromHome()">
-        <option value="0.9">0.9x audio</option>
-        <option value="1.0" selected>1.0x audio</option>
-        <option value="1.1">1.1x audio</option>
-      </select>
-      <button class="btn-ghost" onclick="testDefaultAudio()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-        Test Audio
-      </button>
+      <div class="controls" id="homeControls">
+        <select id="homeSpeedSelect" class="control-select" onchange="syncSpeedFromHome()">
+          <option value="0.9">0.9x</option>
+          <option value="1.0" selected>1.0x</option>
+          <option value="1.1">1.1x</option>
+        </select>
+        <button class="btn-ghost" id="homeTestAudioBtn" onclick="testDefaultAudio()"></button>
+      </div>
+
+      <div class="global-toggles">
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" class="lang-btn" id="langBtnEn" onclick="setLang('en')">EN</button>
+          <button type="button" class="lang-btn" id="langBtnId" onclick="setLang('id')">ID</button>
+        </div>
+        <button type="button" class="theme-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+      </div>
     </div>
   </div>
 </header>
@@ -861,24 +973,24 @@
 <!-- VIEW 1: HOMEPAGE -->
 <div id="homeView" class="home-wrap">
   <div class="home-hero">
-    <div class="kicker">TOEIC Listening &amp; Reading Preparation</div>
-    <h1>Mock Exam Center</h1>
-    <p class="home-lead">Choose a diagnostic half-length test or a full 200-question simulation. Progress, answers, timer state, and completed scores are saved automatically in your browser.</p>
+    <div class="kicker" id="homeKicker"></div>
+    <h1 id="homeTitle"></h1>
+    <p class="home-lead" id="homeLead"></p>
   </div>
 
   <div class="summary-strip" id="homeSummaryStrip"></div>
 
   <div class="section-heading">
-    <h2>Available Exams</h2>
-    <span>Local Supertonic-3 MP3 audio · Offline ready</span>
+    <h2 id="availExamsHeading"></h2>
+    <span id="availExamsSub"></span>
   </div>
   <div class="exam-list" id="examCardList"></div>
 
   <div id="masteryPanel" class="mastery-panel hidden"></div>
 
   <div class="home-utility">
-    <span>All progress is stored locally in this browser. Works directly on GitHub Pages or offline locally (keep the <code>audio/</code> folder beside <code>index.html</code>).</span>
-    <button class="btn-subtle" onclick="exportAllResults()">Copy Overall Progress Summary</button>
+    <span id="homeUtilityText"></span>
+    <button class="btn-subtle" id="copyOverallBtn" onclick="exportAllResults()"></button>
   </div>
 </div>
 
@@ -889,38 +1001,35 @@
   <p class="start-lead" id="setupLead"></p>
 
   <div id="resumeBanner" class="resume-banner hidden">
-    <span id="resumeText">Saved progress found.</span>
+    <span id="resumeText"></span>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn-primary" onclick="resumeSaved()">Resume Saved Session</button>
-      <button class="btn-ghost" onclick="clearSavedInSetup()">Clear Saved</button>
+      <button class="btn-primary" id="resumeSessionBtn" onclick="resumeSaved()"></button>
+      <button class="btn-ghost" id="clearSavedBtn" onclick="clearSavedInSetup()"></button>
     </div>
   </div>
 
   <table class="toeic-table">
     <thead>
-      <tr><th>Section</th><th>Breakdown</th><th>Questions</th><th>Time</th></tr>
+      <tr id="setupTableHead"></tr>
     </thead>
     <tbody id="setupTableBody"></tbody>
   </table>
 
   <div class="mode-box">
-    <div class="mode-title">Listening Mode</div>
+    <div class="mode-title" id="listeningModeTitle"></div>
     <div class="mode-options">
       <label class="mode-opt">
         <input type="radio" name="examMode" value="exam" checked />
-        <span><strong>Exam Mode:</strong> Each audio track plays once (you can still pause and resume). Transcripts stay hidden until you submit.</span>
+        <span id="examModeDesc"></span>
       </label>
       <label class="mode-opt">
         <input type="radio" name="examMode" value="practice" />
-        <span><strong>Practice Mode:</strong> Replay and seek freely on any track. Transcripts stay hidden until you submit.</span>
+        <span id="practiceModeDesc"></span>
       </label>
     </div>
     <div class="audio-check-row">
-      <span>Check your speakers or headphones before beginning.</span>
-      <button class="btn-ghost" onclick="testVoice()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-        Test Audio
-      </button>
+      <span id="audioCheckHint"></span>
+      <button class="btn-ghost" id="setupTestAudioBtn" onclick="testVoice()"></button>
     </div>
   </div>
 
@@ -937,21 +1046,21 @@
     <div class="part-nav" id="partTabs"></div>
     <div id="questionContainer"></div>
     <div class="nav-footer">
-      <button class="btn-ghost" id="prevBtn" onclick="goStep(-1)">Previous</button>
+      <button class="btn-ghost" id="prevBtn" onclick="goStep(-1)"></button>
       <span id="groupIndicator" class="screen-counter"></span>
-      <button class="btn-primary" id="nextBtn" onclick="goStep(1)">Next</button>
+      <button class="btn-primary" id="nextBtn" onclick="goStep(1)"></button>
     </div>
   </main>
 
   <aside class="sidebar">
     <div class="side-head">
-      <span class="side-title">Navigator</span>
-      <span id="sideSectionLabel" class="side-sub">Listening</span>
+      <span class="side-title" id="sideTitle"></span>
+      <span id="sideSectionLabel" class="side-sub"></span>
     </div>
     <div class="nav-scroll">
-      <div class="nav-group-label" id="navLabelL">Listening</div>
+      <div class="nav-group-label" id="navLabelL"></div>
       <div class="nav-grid" id="navGridL"></div>
-      <div class="nav-group-label" id="navLabelR">Reading</div>
+      <div class="nav-group-label" id="navLabelR"></div>
       <div class="nav-grid" id="navGridR"></div>
     </div>
     <div class="pace-notes" id="paceNotes"></div>
@@ -964,8 +1073,275 @@ const EXAMS = [{"id": "half_100q", "title": "Half-Length Mock Exam", "subtitle":
 const ICON_PLAY = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>';
 const ICON_PAUSE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
 const ICON_REPLAY = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+const ICON_BACK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>';
+const ICON_SPEAKER = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+const ICON_MOON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+const ICON_SUN = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
 
+const I18N = {
+  en: {
+    brandTitle: "TOEIC Mock Exam Hub",
+    brandSub: "3 Practice Exams · 500 Questions",
+    allExams: "All Exams",
+    answered: "Answered",
+    speedSuffix: "speed",
+    audioSuffix: "audio",
+    examMode: "Exam Mode",
+    practiceMode: "Practice Mode",
+    pauseTimer: "Pause Timer",
+    resumeTimer: "Resume Timer",
+    submit: "Submit",
+    testAudio: "Test Audio",
+    themeToDark: "Switch to Dark Mode",
+    themeToLight: "Switch to Light Mode",
+    homeKicker: "TOEIC Listening & Reading Preparation",
+    homeTitle: "Mock Exam Center",
+    homeLead: "Choose a diagnostic half-length test or a full 200-question simulation. Progress, answers, timer state, and completed scores are saved automatically in your browser.",
+    availExams: "Available Exams",
+    availSub: "Local Supertonic-3 MP3 audio · Offline ready",
+    utilityText: "All progress is stored locally in this browser. Works directly on GitHub Pages or offline locally (keep the <code>audio/</code> folder beside <code>index.html</code>).",
+    copyOverall: "Copy Overall Progress Summary",
+    examsCompleted: "Exams Completed",
+    questionsAnswered: "Questions Answered",
+    bestScore: "Best Est. Scaled Score",
+    avgAcc: "Avg. Accuracy (Graded)",
+    notYet: "Not yet",
+    pending: "Pending",
+    statusNotStarted: "Not Started",
+    statusInProgress: "In Progress",
+    statusCompleted: "Completed",
+    scaled: "Scaled",
+    listening: "Listening",
+    reading: "Reading",
+    accuracy: "Accuracy",
+    best: "Best",
+    prevBest: "Previous best score",
+    reviewResults: "Review Results",
+    retakeExam: "Retake Exam",
+    resumeExam: "Resume Exam",
+    optionsReset: "Options / Reset",
+    openExam: "Open Exam",
+    questionsWord: "questions",
+    fullMin: "min full",
+    readMin: "min reading",
+    tracksWord: "MP3 tracks",
+    ofWord: "of",
+    answeredLower: "answered",
+    leftWord: "left",
+    pageWord: "Page",
+    partByPart: "Part-by-Part Accuracy",
+    aggAcross: (n) => `Aggregated across ${n} graded exam${n > 1 ? "s" : ""}`,
+    partWord: "Part",
+    partShort: { 1: "Photos", 2: "Q-Resp", 3: "Conv", 4: "Talks", 5: "Sentences", 6: "Text Comp", 7: "Reading" },
+    resumeSession: "Resume Saved Session",
+    clearSaved: "Clear Saved",
+    savedSessionFound: (cnt, total, time) => `Saved session found: ${cnt} of ${total} answered, ${time} remaining.`,
+    tableCols: ["Section", "Breakdown", "Questions", "Time"],
+    totalWord: "Total",
+    scoredScale: "Scored on the official 10 to 990 TOEIC scale",
+    minWord: "min",
+    listeningMode: "Listening Mode",
+    examModeDesc: "<strong>Exam Mode:</strong> Each audio track plays once (you can still pause and resume). Transcripts stay hidden until you submit.",
+    practiceModeDesc: "<strong>Practice Mode:</strong> Replay and seek freely on any track. Transcripts stay hidden until you submit.",
+    audioCheckHint: "Check your speakers or headphones before beginning.",
+    startFull: (q, m) => `Start Full ${q}-Question Exam (${m} min)`,
+    startReading: (from, to, m) => `Start Reading Only (Q${from} to Q${to}, ${m} min)`,
+    previous: "Previous",
+    next: "Next",
+    navigator: "Navigator",
+    navRange: (sec, a, b) => `${sec} (${a} to ${b})`,
+    playAudio: "Play Audio",
+    playing: "Playing",
+    resume: "Resume",
+    pause: "Pause",
+    replay: "Replay",
+    played: "Played",
+    audioReady: "Ready. Press Play Audio to listen.",
+    audioLocked: "Completed in Exam Mode. Switch to Practice Mode in the top bar to replay.",
+    audioLoading: "Loading audio...",
+    audioStarting: "Starting audio...",
+    audioSpeaking: (lbl) => `Speaking: ${lbl}`,
+    audioPausedAt: (t) => `Paused at ${t}.`,
+    audioResumedFrom: (t) => `Resumed from ${t}`,
+    audioFinished: "Finished. Select your answer.",
+    audioMissing: "Audio file missing. Keep the audio folder next to this HTML file.",
+    audioBlocked: "Playback blocked. Click Play Audio again.",
+    audioAlertOnce: "Exam Mode allows playing each finished track once. Switch to Practice Mode in the top bar to replay.",
+    audioTestErr: "Could not play MP3 audio. Keep the audio folders beside this HTML file.",
+    spokenChoice: (letter) => `Choice ${letter} (spoken in audio)`,
+    audioHintP12: "Choices are spoken aloud in the audio and highlighted as each option plays, matching the real TOEIC format.",
+    correct: "Correct",
+    missedFmt: (yours, key) => `Missed · Your answer: ${yours} · Official key: ${key}`,
+    blank: "Blank",
+    audioTranscript: "Audio Transcript",
+    timeUpAlert: "Time is up. Your exam will now be graded.",
+    confirmBlank: (ans, total) => `You have answered ${ans} of ${total} questions (${total - ans} blank). Submit and grade now?`,
+    confirmAll: (total) => `Submit all ${total} answers and view your score and explanations?`,
+    resultsKicker: "Results Summary",
+    gradedSuffix: "Graded",
+    copyAiTutor: "Copy Results for AI Tutor",
+    backAllExams: "Back to All Exams",
+    estScaledLbl: "Est. Scaled Score / 990",
+    estPrefix: "Est.",
+    timeElapsed: "Time Elapsed",
+    scoreTableCols: ["Part", "Correct", "Accuracy"],
+    reviewHint: "Click any red number in the Navigator to review official explanations and audio transcripts, or copy your results back into chat to update <code>mistake_log.md</code>.",
+    copiedResults: "Results copied. Paste them into chat to review your weak areas and log mistakes.",
+    copiedOverall: "Overall progress summary copied to clipboard.",
+    copyPrompt: "Copy this summary:"
+  },
+  id: {
+    brandTitle: "Pusat Simulasi TOEIC",
+    brandSub: "3 Paket Ujian · 500 Soal",
+    allExams: "Semua Ujian",
+    answered: "Terjawab",
+    speedSuffix: "kecepatan",
+    audioSuffix: "audio",
+    examMode: "Mode Ujian",
+    practiceMode: "Mode Latihan",
+    pauseTimer: "Jeda Waktu",
+    resumeTimer: "Lanjut Waktu",
+    submit: "Kumpulkan",
+    testAudio: "Tes Audio",
+    themeToDark: "Aktifkan Mode Gelap",
+    themeToLight: "Aktifkan Mode Terang",
+    homeKicker: "Persiapan TOEIC Listening & Reading",
+    homeTitle: "Pusat Simulasi Ujian",
+    homeLead: "Pilih tes diagnostik setengah durasi atau simulasi penuh 200 soal. Progres, jawaban, sisa waktu, dan skor akhir tersimpan otomatis di browser Anda.",
+    availExams: "Paket Ujian Tersedia",
+    availSub: "Audio lokal Supertonic-3 MP3 · Siap offline",
+    utilityText: "Semua progres tersimpan secara lokal di browser ini. Berjalan langsung di GitHub Pages atau offline secara lokal (pastikan folder <code>audio/</code> berada di samping <code>index.html</code>).",
+    copyOverall: "Salin Ringkasan Progres",
+    examsCompleted: "Ujian Selesai",
+    questionsAnswered: "Soal Terjawab",
+    bestScore: "Skor Skala Terbaik",
+    avgAcc: "Rata-rata Akurasi",
+    notYet: "Belum ada",
+    pending: "Belum dinilai",
+    statusNotStarted: "Belum Mulai",
+    statusInProgress: "Sedang Dikerjakan",
+    statusCompleted: "Selesai",
+    scaled: "Skor Skala",
+    listening: "Listening",
+    reading: "Reading",
+    accuracy: "Akurasi",
+    best: "Terbaik",
+    prevBest: "Skor terbaik sebelumnya",
+    reviewResults: "Lihat Hasil",
+    retakeExam: "Ulangi Ujian",
+    resumeExam: "Lanjutkan Ujian",
+    optionsReset: "Opsi / Reset",
+    openExam: "Buka Ujian",
+    questionsWord: "soal",
+    fullMin: "mnt penuh",
+    readMin: "mnt reading",
+    tracksWord: "trek MP3",
+    ofWord: "dari",
+    answeredLower: "terjawab",
+    leftWord: "tersisa",
+    pageWord: "Halaman",
+    partByPart: "Akurasi per Bagian",
+    aggAcross: (n) => `Gabungan dari ${n} ujian yang telah dinilai`,
+    partWord: "Bagian",
+    partShort: { 1: "Foto", 2: "Tanya-Jawab", 3: "Percakapan", 4: "Monolog", 5: "Kalimat", 6: "Lengkapi Teks", 7: "Bacaan" },
+    resumeSession: "Lanjutkan Sesi Tersimpan",
+    clearSaved: "Hapus Progres",
+    savedSessionFound: (cnt, total, time) => `Sesi tersimpan ditemukan: ${cnt} dari ${total} soal terjawab, sisa waktu ${time}.`,
+    tableCols: ["Sesi", "Rincian", "Jumlah Soal", "Waktu"],
+    totalWord: "Total",
+    scoredScale: "Dinilai dengan skala resmi TOEIC 10 sampai 990",
+    minWord: "mnt",
+    listeningMode: "Mode Audio Listening",
+    examModeDesc: "<strong>Mode Ujian:</strong> Setiap trek audio hanya diputar sekali (tetap bisa dijeda dan dilanjutkan). Transkrip tersembunyi sampai Anda mengumpulkan jawaban.",
+    practiceModeDesc: "<strong>Mode Latihan:</strong> Bebas memutar ulang dan menggeser durasi audio. Transkrip tetap tersembunyi sampai ujian dikumpulkan.",
+    audioCheckHint: "Periksa speaker atau headphone Anda sebelum memulai.",
+    startFull: (q, m) => `Mulai Ujian Penuh ${q} Soal (${m} mnt)`,
+    startReading: (from, to, m) => `Mulai Reading Saja (Q${from} sampai Q${to}, ${m} mnt)`,
+    previous: "Sebelumnya",
+    next: "Berikutnya",
+    navigator: "Navigasi",
+    navRange: (sec, a, b) => `${sec} (${a} sampai ${b})`,
+    playAudio: "Putar Audio",
+    playing: "Memutar",
+    resume: "Lanjutkan",
+    pause: "Jeda",
+    replay: "Putar Ulang",
+    played: "Sudah Diputar",
+    audioReady: "Siap. Tekan Putar Audio untuk mendengarkan.",
+    audioLocked: "Selesai di Mode Ujian. Ubah ke Mode Latihan di bilah atas untuk memutar ulang.",
+    audioLoading: "Memuat audio...",
+    audioStarting: "Memulai audio...",
+    audioSpeaking: (lbl) => `Sedang dibacakan: ${lbl}`,
+    audioPausedAt: (t) => `Dijeda pada ${t}.`,
+    audioResumedFrom: (t) => `Dilanjutkan dari ${t}`,
+    audioFinished: "Audio selesai. Pilih jawaban Anda.",
+    audioMissing: "File audio tidak ditemukan. Pastikan folder audio berada di samping file HTML ini.",
+    audioBlocked: "Pemutaran diblokir browser. Klik Putar Audio sekali lagi.",
+    audioAlertOnce: "Mode Ujian hanya mengizinkan satu kali pemutaran per trek. Ubah ke Mode Latihan di bilah atas untuk memutar ulang.",
+    audioTestErr: "Tidak dapat memutar audio MP3. Pastikan folder audio berada di samping file HTML ini.",
+    spokenChoice: (letter) => `Pilihan ${letter} (dibacakan di audio)`,
+    audioHintP12: "Pilihan dibacakan langsung di audio dan ditandai saat diputar, sesuai format TOEIC asli.",
+    correct: "Benar",
+    missedFmt: (yours, key) => `Salah · Jawaban Anda: ${yours} · Kunci Resmi: ${key}`,
+    blank: "Kosong",
+    audioTranscript: "Transkrip Audio",
+    timeUpAlert: "Waktu habis. Ujian Anda akan langsung dinilai.",
+    confirmBlank: (ans, total) => `Anda baru menjawab ${ans} dari ${total} soal (${total - ans} kosong). Kumpulkan dan nilai sekarang?`,
+    confirmAll: (total) => `Kumpulkan seluruh ${total} jawaban untuk melihat skor dan pembahasan?`,
+    resultsKicker: "Ringkasan Hasil",
+    gradedSuffix: "Selesai Dinilai",
+    copyAiTutor: "Salin Hasil untuk Tutor AI",
+    backAllExams: "Kembali ke Semua Ujian",
+    estScaledLbl: "Estimasi Skor Skala / 990",
+    estPrefix: "Est.",
+    timeElapsed: "Waktu Terpakai",
+    scoreTableCols: ["Bagian", "Benar", "Akurasi"],
+    reviewHint: "Klik nomor merah di Navigasi untuk melihat pembahasan resmi dan transkrip audio, atau salin hasil ke chat untuk memperbarui <code>mistake_log.md</code>.",
+    copiedResults: "Hasil berhasil disalin. Tempel di chat untuk menganalisis kelemahan dan mencatat kesalahan.",
+    copiedOverall: "Ringkasan progres keseluruhan berhasil disalin.",
+    copyPrompt: "Salin ringkasan ini:"
+  }
+};
+
+const PART_I18N_ID = {
+  1: { title: "Bagian 1: Foto (Photographs)", dir: "Perhatikan foto dan tekan Putar Audio untuk mendengarkan empat pernyataan (A sampai D). Pilih pernyataan yang paling sesuai dengan gambar." },
+  2: { title: "Bagian 2: Tanya-Jawab (Question-Response)", dir: "Dengarkan pertanyaan atau pernyataan serta tiga respons (A, B, C). Pilihan tidak dicetak seperti pada TOEIC asli; pilih respons terbaik." },
+  3: { title: "Bagian 3: Percakapan (Conversations)", dir: "Dengarkan percakapan antara dua atau tiga pembicara dan jawab tiga pertanyaan di bawah ini. Baca pertanyaan terlebih dahulu sebelum memutar audio." },
+  4: { title: "Bagian 4: Monolog Singkat (Talks)", dir: "Dengarkan monolog singkat dan jawab tiga pertanyaan di bawah ini. Baca pertanyaan terlebih dahulu sebelum memutar audio." },
+  5: { title: "Bagian 5: Melengkapi Kalimat (Incomplete Sentences)", dir: "Pilih kata atau frasa terbaik untuk melengkapi setiap kalimat. Target waktu: maksimal 24 detik per soal." },
+  6: { title: "Bagian 6: Melengkapi Teks (Text Completion)", dir: "Baca teks dan pilih kata, frasa, atau kalimat terbaik untuk mengisi setiap bagian yang kosong." },
+  7: { title: "Bagian 7: Pemahaman Bacaan (Reading Comprehension)", dir: "Baca teks atau beberapa dokumen di bawah ini lalu pilih jawaban terbaik untuk setiap pertanyaan." }
+};
+
+const EXAM_I18N_ID = {
+  half_100q: {
+    title: "Simulasi Setengah Durasi",
+    subtitle: "Diagnostik Seimbang 100 Soal · Skala 50% dari TOEIC Resmi",
+    lead: "Tes diagnostik TOEIC Listening & Reading berdurasi 60 menit yang mencakup seluruh 7 bagian, lengkap dengan foto asli Bagian 1, audio MP3 lokal Supertonic-3, simpan otomatis, dan pembahasan resmi.",
+    lengthLabel: "Setengah Durasi",
+    paceNotesHtml: "<strong>Panduan Waktu (60 mnt)</strong>Listening (Q1–50): ~22 mnt<br>Bagian 5 (Q51–65): maks 6 mnt<br>Bagian 6 (Q66–73): maks 4 mnt<br>Bagian 7 (Q74–100): 28 mnt"
+  },
+  full_exam_1: {
+    title: "Simulasi Penuh TOEIC 1",
+    subtitle: "Barron's New TOEIC Practice Exam A · Lengkap 200 Soal",
+    lead: "Simulasi lengkap 200 soal TOEIC Listening & Reading sesuai format resmi, dilengkapi seluruh foto Bagian 1, grafik Bagian 3 dan 4, audio MP3 lokal Supertonic-3, simpan otomatis, dan pembahasan resmi.",
+    lengthLabel: "Ujian Penuh",
+    paceNotesHtml: "<strong>Panduan Resmi (120 mnt)</strong>Listening (Q1–100): 45 mnt<br>Bagian 5 (Q101–130): maks 12 mnt<br>Bagian 6 (Q131–146): maks 8 mnt<br>Bagian 7 (Q147–200): 55 mnt"
+  },
+  full_exam_2: {
+    title: "Simulasi Penuh TOEIC 2",
+    subtitle: "Barron's New TOEIC Practice Exam B · Lengkap 200 Soal",
+    lead: "Paket simulasi lengkap kedua berisi 200 soal baru (foto, percakapan, monolog, serta bacaan tunggal, ganda, dan tiga dokumen), audio MP3 lokal Supertonic-3, simpan otomatis, dan pembahasan resmi.",
+    lengthLabel: "Ujian Penuh",
+    paceNotesHtml: "<strong>Panduan Resmi (120 mnt)</strong>Listening (Q1–100): 45 mnt<br>Bagian 5 (Q101–130): maks 12 mnt<br>Bagian 6 (Q131–146): maks 8 mnt<br>Bagian 7 (Q147–200): 55 mnt"
+  }
+};
+
+let currentLang = "en";
+let currentTheme = "light";
+let currentView = "home"; // "home" | "setup" | "exam"
 let currentExam = null;
+
 let state = {
   started: false,
   submitted: false,
@@ -984,6 +1360,124 @@ let state = {
 let timerHandle = null;
 let activeAudioEl = null;
 let audioState = { groupId: null, playing: false, paused: false };
+
+function t() { return I18N[currentLang] || I18N.en; }
+
+function getExamText(exam) {
+  if (currentLang === "id" && EXAM_I18N_ID[exam.id]) {
+    return Object.assign({}, exam, EXAM_I18N_ID[exam.id]);
+  }
+  return exam;
+}
+
+function initPreferences() {
+  try {
+    const savedLang = localStorage.getItem("toeic_hub_lang");
+    if (savedLang === "id" || savedLang === "en") currentLang = savedLang;
+  } catch (e) {}
+  currentTheme = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+  applyThemeUI();
+  applyLangUI();
+}
+
+function setLang(lang) {
+  if (lang !== "en" && lang !== "id") return;
+  currentLang = lang;
+  try { localStorage.setItem("toeic_hub_lang", lang); } catch (e) {}
+  applyLangUI();
+  rerenderActiveView();
+}
+
+function toggleTheme() {
+  currentTheme = currentTheme === "dark" ? "light" : "dark";
+  if (currentTheme === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+  }
+  try { localStorage.setItem("toeic_hub_theme", currentTheme); } catch (e) {}
+  applyThemeUI();
+}
+
+function applyThemeUI() {
+  const btn = document.getElementById("themeToggleBtn");
+  const tr = t();
+  if (btn) {
+    btn.innerHTML = currentTheme === "dark" ? ICON_SUN : ICON_MOON;
+    btn.title = currentTheme === "dark" ? tr.themeToLight : tr.themeToDark;
+    btn.setAttribute("aria-label", btn.title);
+  }
+}
+
+function applyLangUI() {
+  const tr = t();
+  document.documentElement.lang = currentLang;
+  document.getElementById("langBtnEn").classList.toggle("active", currentLang === "en");
+  document.getElementById("langBtnId").classList.toggle("active", currentLang === "id");
+
+  document.getElementById("homeBackBtn").innerHTML = `${ICON_BACK} ${tr.allExams}`;
+  document.getElementById("answeredLabel").textContent = tr.answered;
+  document.getElementById("submitBtn").textContent = tr.submit;
+  document.getElementById("modeToggleBtn").textContent = state.mode === "exam" ? tr.examMode : tr.practiceMode;
+  document.getElementById("pauseBtn").textContent = state.paused ? tr.resumeTimer : tr.pauseTimer;
+  document.getElementById("homeTestAudioBtn").innerHTML = `${ICON_SPEAKER} ${tr.testAudio}`;
+  document.getElementById("setupTestAudioBtn").innerHTML = `${ICON_SPEAKER} ${tr.testAudio}`;
+
+  const sSel = document.getElementById("speedSelect");
+  const hSel = document.getElementById("homeSpeedSelect");
+  [0.9, 1.0, 1.1].forEach((val, idx) => {
+    const vStr = val.toFixed(1);
+    if (sSel.options[idx]) sSel.options[idx].textContent = `${vStr}x ${tr.speedSuffix}`;
+    if (hSel.options[idx]) hSel.options[idx].textContent = `${vStr}x ${tr.audioSuffix}`;
+  });
+
+  document.getElementById("homeKicker").textContent = tr.homeKicker;
+  document.getElementById("homeTitle").textContent = tr.homeTitle;
+  document.getElementById("homeLead").textContent = tr.homeLead;
+  document.getElementById("availExamsHeading").textContent = tr.availExams;
+  document.getElementById("availExamsSub").textContent = tr.availSub;
+  document.getElementById("homeUtilityText").innerHTML = tr.utilityText;
+  document.getElementById("copyOverallBtn").textContent = tr.copyOverall;
+
+  document.getElementById("resumeSessionBtn").textContent = tr.resumeSession;
+  document.getElementById("clearSavedBtn").textContent = tr.clearSaved;
+  document.getElementById("setupTableHead").innerHTML = tr.tableCols.map(c => `<th>${c}</th>`).join("");
+  document.getElementById("listeningModeTitle").textContent = tr.listeningMode;
+  document.getElementById("examModeDesc").innerHTML = tr.examModeDesc;
+  document.getElementById("practiceModeDesc").innerHTML = tr.practiceModeDesc;
+  document.getElementById("audioCheckHint").textContent = tr.audioCheckHint;
+
+  document.getElementById("prevBtn").textContent = tr.previous;
+  document.getElementById("nextBtn").textContent = tr.next;
+  document.getElementById("sideTitle").textContent = tr.navigator;
+  applyThemeUI();
+}
+
+function rerenderActiveView() {
+  const tr = t();
+  if (currentView === "home") {
+    document.getElementById("headerTitle").textContent = tr.brandTitle;
+    document.getElementById("headerSub").textContent = tr.brandSub;
+    renderHome();
+  } else if (currentView === "setup" && currentExam) {
+    renderSetupView();
+  } else if (currentView === "exam" && currentExam) {
+    const ex = getExamText(currentExam);
+    document.getElementById("headerTitle").textContent = ex.title;
+    document.getElementById("headerSub").textContent = `${currentExam.totalQs} ${tr.questionsWord} · ${ex.lengthLabel}`;
+    document.getElementById("navLabelL").textContent = tr.navRange(tr.listening, 1, currentExam.listeningQs);
+    document.getElementById("navLabelR").textContent = tr.navRange(tr.reading, currentExam.listeningQs + 1, currentExam.totalQs);
+    document.getElementById("paceNotes").innerHTML = ex.paceNotesHtml;
+    renderPartTabs();
+    renderNavGrid();
+    if (state.submitted) renderScoreBanner();
+    renderCurrentGroup();
+    const g = currentExam.groups[state.currentGroupIdx];
+    if (g && g.audioFile && audioState.groupId === g.id) {
+      updateAudioControlsUI(g.id);
+    }
+  }
+}
 
 function getExamById(id) {
   return EXAMS.find(e => e.id === id) || null;
@@ -1058,7 +1552,7 @@ function fmtDate(iso) {
   if (!iso) return "";
   try {
     const d = new Date(iso);
-    return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    return d.toLocaleDateString(currentLang === "id" ? "id-ID" : undefined, { month: "short", day: "numeric", year: "numeric" });
   } catch (e) {
     return "";
   }
@@ -1081,25 +1575,20 @@ function onSpeedChange() {
   }
 }
 
-function testDefaultAudio() {
-  playSampleAudio(EXAMS[0].testAudioFile);
-}
-
-function testVoice() {
-  if (!currentExam) return;
-  playSampleAudio(currentExam.testAudioFile);
-}
+function testDefaultAudio() { playSampleAudio(EXAMS[0].testAudioFile); }
+function testVoice() { if (currentExam) playSampleAudio(currentExam.testAudioFile); }
 
 function playSampleAudio(file) {
   stopAudio(true);
   const a = new Audio(file);
   a.playbackRate = parseFloat(document.getElementById("speedSelect").value);
-  a.play().catch(() => alert("Could not play MP3 audio. Keep the audio folders beside this HTML file."));
+  a.play().catch(() => alert(t().audioTestErr));
   setTimeout(() => { try { a.pause(); } catch (e) {} }, 3500);
 }
 
 /* ==================== HOMEPAGE ==================== */
 function renderHome() {
+  const tr = t();
   let completedCount = 0;
   let totalAnsweredAll = 0;
   let totalQsAll = 0;
@@ -1108,6 +1597,7 @@ function renderHome() {
   const aggParts = {1:[0,0], 2:[0,0], 3:[0,0], 4:[0,0], 5:[0,0], 6:[0,0], 7:[0,0]};
 
   const cardHtmlList = EXAMS.map(exam => {
+    const ex = getExamText(exam);
     totalQsAll += exam.totalQs;
     const saved = loadSavedFor(exam);
     const answered = saved ? Object.keys(saved.answers || {}).length : 0;
@@ -1133,63 +1623,63 @@ function renderHome() {
       if (bestScaledOverall === null || saved.bestScore > bestScaledOverall) bestScaledOverall = saved.bestScore;
     }
 
-    let statusBadge = `<span class="status-pill">Not Started</span>`;
+    let statusBadge = `<span class="status-pill">${tr.statusNotStarted}</span>`;
     let progressHtml = "";
     let actionsHtml = "";
 
     if (isSubmitted && result) {
-      statusBadge = `<span class="status-pill done">Completed</span>`;
+      statusBadge = `<span class="status-pill done">${tr.statusCompleted}</span>`;
       const dateStr = saved.completedAt ? ` · ${fmtDate(saved.completedAt)}` : "";
-      const bestNote = saved.bestScore && saved.bestScore > result.totalScaled ? ` · Best: <strong>${saved.bestScore}</strong>` : "";
+      const bestNote = saved.bestScore && saved.bestScore > result.totalScaled ? ` · ${tr.best}: <strong>${saved.bestScore}</strong>` : "";
       progressHtml = `
         <div class="exam-progress-block">
           <div class="progress-row">
             <div class="score-inline">
-              <span>Scaled: <strong>${result.totalScaled} / 990</strong></span>
-              <span>Listening: <strong>${result.lCorrect}/${exam.listeningQs}</strong> (${result.lScaled})</span>
-              <span>Reading: <strong>${result.rCorrect}/${exam.readingQs}</strong> (${result.rScaled})</span>
-              <span>Accuracy: <strong>${result.accuracy}%</strong>${bestNote}${dateStr}</span>
+              <span>${tr.scaled}: <strong>${result.totalScaled} / 990</strong></span>
+              <span>${tr.listening}: <strong>${result.lCorrect}/${exam.listeningQs}</strong> (${result.lScaled})</span>
+              <span>${tr.reading}: <strong>${result.rCorrect}/${exam.readingQs}</strong> (${result.rScaled})</span>
+              <span>${tr.accuracy}: <strong>${result.accuracy}%</strong>${bestNote}${dateStr}</span>
             </div>
           </div>
           <div class="progress-track"><div class="progress-fill done" style="width:${result.accuracy}%"></div></div>
         </div>`;
       actionsHtml = `
-        <button class="btn-primary" onclick="openExamReview('${exam.id}')">Review Results</button>
-        <button class="btn-ghost" onclick="openExamSetup('${exam.id}')">Retake Exam</button>`;
+        <button class="btn-primary" onclick="openExamReview('${exam.id}')">${tr.reviewResults}</button>
+        <button class="btn-ghost" onclick="openExamSetup('${exam.id}')">${tr.retakeExam}</button>`;
     } else if (hasProgress) {
       const pct = Math.round((answered / exam.totalQs) * 100);
-      statusBadge = `<span class="status-pill progress">In Progress</span>`;
+      statusBadge = `<span class="status-pill progress">${tr.statusInProgress}</span>`;
       progressHtml = `
         <div class="exam-progress-block">
           <div class="progress-row">
-            <span><strong>${answered} of ${exam.totalQs}</strong> answered (${pct}%)</span>
-            <span>${fmtTime(saved.secondsLeft || 0)} left · Page ${(saved.currentGroupIdx || 0) + 1} of ${exam.groups.length}</span>
+            <span><strong>${answered} ${tr.ofWord} ${exam.totalQs}</strong> ${tr.answeredLower} (${pct}%)</span>
+            <span>${fmtTime(saved.secondsLeft || 0)} ${tr.leftWord} · ${tr.pageWord} ${(saved.currentGroupIdx || 0) + 1} ${tr.ofWord} ${exam.groups.length}</span>
           </div>
           <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
         </div>`;
       actionsHtml = `
-        <button class="btn-primary" onclick="resumeExamDirectly('${exam.id}')">Resume Exam</button>
-        <button class="btn-ghost" onclick="openExamSetup('${exam.id}')">Options / Reset</button>`;
+        <button class="btn-primary" onclick="resumeExamDirectly('${exam.id}')">${tr.resumeExam}</button>
+        <button class="btn-ghost" onclick="openExamSetup('${exam.id}')">${tr.optionsReset}</button>`;
     } else {
       const prevBest = saved && saved.bestScore
-        ? `<div class="exam-progress-block"><div class="progress-row"><span>Previous best score: <strong>${saved.bestScore} / 990</strong></span></div></div>`
+        ? `<div class="exam-progress-block"><div class="progress-row"><span>${tr.prevBest}: <strong>${saved.bestScore} / 990</strong></span></div></div>`
         : "";
       progressHtml = prevBest;
-      actionsHtml = `<button class="btn-primary" onclick="openExamSetup('${exam.id}')">Open Exam</button>`;
+      actionsHtml = `<button class="btn-primary" onclick="openExamSetup('${exam.id}')">${tr.openExam}</button>`;
     }
 
     return `
       <div class="exam-card">
         <div>
           <div class="exam-card-head">
-            <h3 class="exam-card-title">${escapeHtml(exam.title)}</h3>
+            <h3 class="exam-card-title">${escapeHtml(ex.title)}</h3>
             ${statusBadge}
           </div>
-          <p class="exam-meta">${escapeHtml(exam.subtitle)}</p>
+          <p class="exam-meta">${escapeHtml(ex.subtitle)}</p>
           <div class="exam-specs">
-            <span>${exam.totalQs} questions (${exam.listeningQs} L / ${exam.readingQs} R)</span>
-            <span>${exam.fullMinutes} min full · ${exam.readingMinutes} min reading</span>
-            <span>${exam.audioCount} MP3 tracks</span>
+            <span>${exam.totalQs} ${tr.questionsWord} (${exam.listeningQs} L / ${exam.readingQs} R)</span>
+            <span>${exam.fullMinutes} ${tr.fullMin} · ${exam.readingMinutes} ${tr.readMin}</span>
+            <span>${exam.audioCount} ${tr.tracksWord}</span>
           </div>
           ${progressHtml}
         </div>
@@ -1201,41 +1691,32 @@ function renderHome() {
 
   document.getElementById("examCardList").innerHTML = cardHtmlList.join("");
 
-  const avgAcc = completedCount > 0 ? `${Math.round(accSum / completedCount)}%` : "Pending";
-  const bestLabel = bestScaledOverall !== null ? `${bestScaledOverall} / 990` : "Not yet";
+  const avgAcc = completedCount > 0 ? `${Math.round(accSum / completedCount)}%` : tr.pending;
+  const bestLabel = bestScaledOverall !== null ? `${bestScaledOverall} / 990` : tr.notYet;
   document.getElementById("homeSummaryStrip").innerHTML = `
-    <div class="summary-tile"><div class="big">${completedCount} / ${EXAMS.length}</div><div class="lbl">Exams Completed</div></div>
-    <div class="summary-tile"><div class="big">${totalAnsweredAll} / ${totalQsAll}</div><div class="lbl">Questions Answered</div></div>
-    <div class="summary-tile"><div class="big">${bestLabel}</div><div class="lbl">Best Est. Scaled Score</div></div>
-    <div class="summary-tile"><div class="big">${avgAcc}</div><div class="lbl">Avg. Accuracy (Graded)</div></div>
+    <div class="summary-tile"><div class="big">${completedCount} / ${EXAMS.length}</div><div class="lbl">${tr.examsCompleted}</div></div>
+    <div class="summary-tile"><div class="big">${totalAnsweredAll} / ${totalQsAll}</div><div class="lbl">${tr.questionsAnswered}</div></div>
+    <div class="summary-tile"><div class="big">${bestLabel}</div><div class="lbl">${tr.bestScore}</div></div>
+    <div class="summary-tile"><div class="big">${avgAcc}</div><div class="lbl">${tr.avgAcc}</div></div>
   `;
 
   const masteryPanel = document.getElementById("masteryPanel");
   if (completedCount > 0) {
-    const partNames = {
-      1: "Photos",
-      2: "Q-Resp",
-      3: "Conv",
-      4: "Talks",
-      5: "Sentences",
-      6: "Text Comp",
-      7: "Reading"
-    };
     let bars = "";
     for (let p = 1; p <= 7; p++) {
-      const [c, t] = aggParts[p];
-      const pct = t ? Math.round((c / t) * 100) : 0;
+      const [c, tot] = aggParts[p];
+      const pct = tot ? Math.round((c / tot) * 100) : 0;
       bars += `
         <div class="part-bar-card">
-          <div class="part-bar-head"><span>Part ${p}</span><strong>${pct}%</strong></div>
+          <div class="part-bar-head"><span>${tr.partWord} ${p}</span><strong>${pct}%</strong></div>
           <div class="progress-track"><div class="progress-fill ${pct >= 80 ? "done" : ""}" style="width:${pct}%"></div></div>
-          <div class="part-bar-sub">${partNames[p]} · ${c}/${t}</div>
+          <div class="part-bar-sub">${tr.partShort[p]} · ${c}/${tot}</div>
         </div>`;
     }
     masteryPanel.innerHTML = `
       <div class="section-heading" style="margin-bottom:0;">
-        <h2>Part-by-Part Accuracy</h2>
-        <span>Aggregated across ${completedCount} graded exam${completedCount > 1 ? "s" : ""}</span>
+        <h2>${tr.partByPart}</h2>
+        <span>${tr.aggAcross(completedCount)}</span>
       </div>
       <div class="part-bars">${bars}</div>`;
     masteryPanel.classList.remove("hidden");
@@ -1251,6 +1732,7 @@ function goHome() {
     saveProgress();
   }
   currentExam = null;
+  currentView = "home";
   state.started = false;
   document.getElementById("homeView").classList.remove("hidden");
   document.getElementById("setupView").classList.add("hidden");
@@ -1258,8 +1740,8 @@ function goHome() {
   document.getElementById("homeBackBtn").classList.add("hidden");
   document.getElementById("examControls").classList.add("hidden");
   document.getElementById("homeControls").classList.remove("hidden");
-  document.getElementById("headerTitle").textContent = "TOEIC Mock Exam Hub";
-  document.getElementById("headerSub").textContent = "3 Practice Exams · 500 Questions";
+  document.getElementById("headerTitle").textContent = t().brandTitle;
+  document.getElementById("headerSub").textContent = t().brandSub;
   renderHome();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -1284,9 +1766,9 @@ function exportAllResults() {
   }
   const text = lines.join("\n");
   navigator.clipboard.writeText(text).then(() => {
-    alert("Overall progress summary copied to clipboard.");
+    alert(t().copiedOverall);
   }).catch(() => {
-    prompt("Copy overall progress summary:", text);
+    prompt(t().copyPrompt, text);
   });
 }
 
@@ -1297,6 +1779,7 @@ function openExamSetup(examId) {
   stopAudio(true);
   if (timerHandle) clearInterval(timerHandle);
   currentExam = exam;
+  currentView = "setup";
 
   document.getElementById("homeView").classList.add("hidden");
   document.getElementById("testLayout").classList.add("hidden");
@@ -1305,32 +1788,40 @@ function openExamSetup(examId) {
   document.getElementById("examControls").classList.add("hidden");
   document.getElementById("homeControls").classList.add("hidden");
 
-  document.getElementById("headerTitle").textContent = exam.title;
-  document.getElementById("headerSub").textContent = `${exam.totalQs} Questions · ${exam.lengthLabel}`;
-  document.getElementById("setupKicker").textContent = exam.subtitle;
-  document.getElementById("setupTitle").textContent = exam.title;
-  document.getElementById("setupLead").textContent = exam.lead;
+  renderSetupView();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderSetupView() {
+  const tr = t();
+  const exam = currentExam;
+  const ex = getExamText(exam);
+  document.getElementById("headerTitle").textContent = ex.title;
+  document.getElementById("headerSub").textContent = `${exam.totalQs} ${tr.questionsWord} · ${ex.lengthLabel}`;
+  document.getElementById("setupKicker").textContent = ex.subtitle;
+  document.getElementById("setupTitle").textContent = ex.title;
+  document.getElementById("setupLead").textContent = ex.lead;
 
   const pCounts = exam.partCounts;
+  const pw = tr.partWord;
   document.getElementById("setupTableBody").innerHTML = `
-    <tr><td><strong>Listening</strong></td><td>Part 1 (${pCounts[1]}), Part 2 (${pCounts[2]}), Part 3 (${pCounts[3]}), Part 4 (${pCounts[4]})</td><td><strong>${exam.listeningQs}</strong></td><td>${exam.listeningMinutes} min</td></tr>
-    <tr><td><strong>Reading</strong></td><td>Part 5 (${pCounts[5]}), Part 6 (${pCounts[6]}), Part 7 (${pCounts[7]})</td><td><strong>${exam.readingQs}</strong></td><td>${exam.readingMinutes} min</td></tr>
-    <tr><td><strong>Total</strong></td><td>Scored on the official 10 to 990 TOEIC scale</td><td><strong>${exam.totalQs}</strong></td><td><strong>${exam.fullMinutes} min</strong></td></tr>
+    <tr><td><strong>${tr.listening}</strong></td><td>${pw} 1 (${pCounts[1]}), ${pw} 2 (${pCounts[2]}), ${pw} 3 (${pCounts[3]}), ${pw} 4 (${pCounts[4]})</td><td><strong>${exam.listeningQs}</strong></td><td>${exam.listeningMinutes} ${tr.minWord}</td></tr>
+    <tr><td><strong>${tr.reading}</strong></td><td>${pw} 5 (${pCounts[5]}), ${pw} 6 (${pCounts[6]}), ${pw} 7 (${pCounts[7]})</td><td><strong>${exam.readingQs}</strong></td><td>${exam.readingMinutes} ${tr.minWord}</td></tr>
+    <tr><td><strong>${tr.totalWord}</strong></td><td>${tr.scoredScale}</td><td><strong>${exam.totalQs}</strong></td><td><strong>${exam.fullMinutes} ${tr.minWord}</strong></td></tr>
   `;
 
-  document.getElementById("startFullBtn").textContent = `Start Full ${exam.totalQs}-Question Exam (${exam.fullMinutes} min)`;
-  document.getElementById("startReadingBtn").textContent = `Start Reading Only (Q${exam.listeningQs + 1} to Q${exam.totalQs}, ${exam.readingMinutes} min)`;
+  document.getElementById("startFullBtn").textContent = tr.startFull(exam.totalQs, exam.fullMinutes);
+  document.getElementById("startReadingBtn").textContent = tr.startReading(exam.listeningQs + 1, exam.totalQs, exam.readingMinutes);
 
   const saved = loadSavedFor(exam);
   const cnt = saved ? Object.keys(saved.answers || {}).length : 0;
   const banner = document.getElementById("resumeBanner");
   if (saved && cnt > 0 && !saved.submitted) {
     banner.classList.remove("hidden");
-    document.getElementById("resumeText").textContent = `Saved session found: ${cnt} of ${exam.totalQs} answered, ${fmtTime(saved.secondsLeft || 0)} remaining.`;
+    document.getElementById("resumeText").textContent = tr.savedSessionFound(cnt, exam.totalQs, fmtTime(saved.secondsLeft || 0));
   } else {
     banner.classList.add("hidden");
   }
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function clearSavedInSetup() {
@@ -1429,6 +1920,9 @@ function startTest(which) {
 }
 
 function enterTestView() {
+  const tr = t();
+  const ex = getExamText(currentExam);
+  currentView = "exam";
   document.getElementById("homeView").classList.add("hidden");
   document.getElementById("setupView").classList.add("hidden");
   document.getElementById("testLayout").classList.remove("hidden");
@@ -1436,17 +1930,17 @@ function enterTestView() {
   document.getElementById("homeControls").classList.add("hidden");
   document.getElementById("examControls").classList.remove("hidden");
 
-  document.getElementById("headerTitle").textContent = currentExam.title;
-  document.getElementById("headerSub").textContent = `${currentExam.totalQs} Questions · ${currentExam.lengthLabel}`;
+  document.getElementById("headerTitle").textContent = ex.title;
+  document.getElementById("headerSub").textContent = `${currentExam.totalQs} ${tr.questionsWord} · ${ex.lengthLabel}`;
   document.getElementById("totalQCount").textContent = String(currentExam.totalQs);
-  document.getElementById("navLabelL").textContent = `Listening (1 to ${currentExam.listeningQs})`;
-  document.getElementById("navLabelR").textContent = `Reading (${currentExam.listeningQs + 1} to ${currentExam.totalQs})`;
-  document.getElementById("paceNotes").innerHTML = currentExam.paceNotesHtml;
+  document.getElementById("navLabelL").textContent = tr.navRange(tr.listening, 1, currentExam.listeningQs);
+  document.getElementById("navLabelR").textContent = tr.navRange(tr.reading, currentExam.listeningQs + 1, currentExam.totalQs);
+  document.getElementById("paceNotes").innerHTML = ex.paceNotesHtml;
 
   document.getElementById("pauseBtn").disabled = state.submitted;
-  document.getElementById("pauseBtn").textContent = "Pause Timer";
+  document.getElementById("pauseBtn").textContent = tr.pauseTimer;
   document.getElementById("submitBtn").disabled = state.submitted;
-  document.getElementById("modeToggleBtn").textContent = state.mode === "exam" ? "Exam Mode" : "Practice Mode";
+  document.getElementById("modeToggleBtn").textContent = state.mode === "exam" ? tr.examMode : tr.practiceMode;
 
   if (!state.submitted) {
     document.getElementById("scoreBanner").classList.add("hidden");
@@ -1492,6 +1986,7 @@ function stopAudio(resetProgress = true) {
 }
 
 function updateAudioControlsUI(groupId, statusMsg, isLive = false) {
+  const tr = t();
   const playBtn = document.getElementById("playBtn_" + groupId);
   const pauseAudioBtn = document.getElementById("pauseAudioBtn_" + groupId);
   const statusEl = document.getElementById("audioStatus_" + groupId);
@@ -1500,28 +1995,28 @@ function updateAudioControlsUI(groupId, statusMsg, isLive = false) {
 
   if (playBtn) {
     if (isThisGroup && audioState.paused) {
-      playBtn.innerHTML = `${ICON_PLAY} Resume`;
+      playBtn.innerHTML = `${ICON_PLAY} ${tr.resume}`;
       playBtn.disabled = false;
     } else if (isThisGroup && audioState.playing) {
-      playBtn.innerHTML = `${ICON_PLAY} Playing`;
+      playBtn.innerHTML = `${ICON_PLAY} ${tr.playing}`;
       playBtn.disabled = true;
     } else if (finished && state.mode === "exam" && !state.submitted) {
-      playBtn.textContent = "Played";
+      playBtn.textContent = tr.played;
       playBtn.disabled = true;
     } else if (finished) {
-      playBtn.innerHTML = `${ICON_REPLAY} Replay`;
+      playBtn.innerHTML = `${ICON_REPLAY} ${tr.replay}`;
       playBtn.disabled = false;
     } else {
-      playBtn.innerHTML = `${ICON_PLAY} Play Audio`;
+      playBtn.innerHTML = `${ICON_PLAY} ${tr.playAudio}`;
       playBtn.disabled = false;
     }
   }
   if (pauseAudioBtn) {
     if (isThisGroup && audioState.playing) {
-      pauseAudioBtn.innerHTML = `${ICON_PAUSE} Pause`;
+      pauseAudioBtn.innerHTML = `${ICON_PAUSE} ${tr.pause}`;
       pauseAudioBtn.disabled = false;
     } else {
-      pauseAudioBtn.innerHTML = `${ICON_PAUSE} Pause`;
+      pauseAudioBtn.innerHTML = `${ICON_PAUSE} ${tr.pause}`;
       pauseAudioBtn.disabled = true;
     }
   }
@@ -1532,18 +2027,19 @@ function updateAudioControlsUI(groupId, statusMsg, isLive = false) {
 }
 
 function toggleAudioPause(groupId) {
+  const tr = t();
   if (audioState.groupId !== groupId || !activeAudioEl) return;
   if (audioState.playing) {
     activeAudioEl.pause();
     audioState.playing = false;
     audioState.paused = true;
-    updateAudioControlsUI(groupId, `Paused at ${fmtTime(activeAudioEl.currentTime)}.`, false);
+    updateAudioControlsUI(groupId, tr.audioPausedAt(fmtTime(activeAudioEl.currentTime)), false);
   } else if (audioState.paused) {
     activeAudioEl.playbackRate = parseFloat(document.getElementById("speedSelect").value);
     activeAudioEl.play();
     audioState.paused = false;
     audioState.playing = true;
-    updateAudioControlsUI(groupId, `Resumed from ${fmtTime(activeAudioEl.currentTime)}`, true);
+    updateAudioControlsUI(groupId, tr.audioResumedFrom(fmtTime(activeAudioEl.currentTime)), true);
   }
 }
 
@@ -1567,7 +2063,7 @@ function playGroupAudio(groupId) {
   }
 
   if (state.mode === "exam" && !state.submitted && state.playedGroups[groupId]) {
-    alert("Exam Mode allows playing each finished track once. Switch to Practice Mode in the top bar to replay.");
+    alert(t().audioAlertOnce);
     return;
   }
 
@@ -1584,19 +2080,19 @@ function playGroupAudio(groupId) {
 
   audio.ontimeupdate = () => {
     if (audioState.groupId !== groupId) return;
-    const t = audio.currentTime;
+    const tNow = audio.currentTime;
     const dur = isFinite(audio.duration) ? audio.duration : totalDur;
     const fill = document.getElementById("audioFill_" + groupId);
     const timeEl = document.getElementById("audioTime_" + groupId);
-    if (fill && dur > 0) fill.style.width = `${Math.min(100, (t / dur) * 100)}%`;
-    if (timeEl) timeEl.textContent = `${fmtTime(t)} / ${fmtTime(dur)}`;
+    if (fill && dur > 0) fill.style.width = `${Math.min(100, (tNow / dur) * 100)}%`;
+    if (timeEl) timeEl.textContent = `${fmtTime(tNow)} / ${fmtTime(dur)}`;
 
-    const curSeg = timings.find(s => t >= s.start - 0.05 && t <= s.end + 0.35);
+    const curSeg = timings.find(s => tNow >= s.start - 0.05 && tNow <= s.end + 0.35);
     if (curSeg) {
       highlightSpeakingOption(curSeg.label);
-      if (audioState.playing) updateAudioControlsUI(groupId, `Speaking: ${curSeg.label}`, true);
-    } else if (t < 0.45 && audioState.playing) {
-      updateAudioControlsUI(groupId, "Starting audio...", true);
+      if (audioState.playing) updateAudioControlsUI(groupId, t().audioSpeaking(curSeg.label), true);
+    } else if (tNow < 0.45 && audioState.playing) {
+      updateAudioControlsUI(groupId, t().audioStarting, true);
     }
   };
 
@@ -1608,27 +2104,28 @@ function playGroupAudio(groupId) {
     clearSpeakingHighlight();
     const fill = document.getElementById("audioFill_" + groupId);
     if (fill) fill.style.width = "100%";
-    updateAudioControlsUI(groupId, "Finished. Select your answer.", false);
+    updateAudioControlsUI(groupId, t().audioFinished, false);
     saveProgress();
   };
 
   audio.onerror = () => {
     audioState.playing = false;
     audioState.paused = false;
-    updateAudioControlsUI(groupId, "Audio file missing. Keep the audio folders next to this HTML file.", false);
+    updateAudioControlsUI(groupId, t().audioMissing, false);
   };
 
-  updateAudioControlsUI(groupId, "Loading audio...", true);
+  updateAudioControlsUI(groupId, t().audioLoading, true);
   audio.play().catch(() => {
     audioState.playing = false;
-    updateAudioControlsUI(groupId, "Playback blocked. Click Play Audio again.", false);
+    updateAudioControlsUI(groupId, t().audioBlocked, false);
   });
 }
 
 /* ==================== EXAM ENGINE ==================== */
 function toggleMode() {
+  const tr = t();
   state.mode = state.mode === "exam" ? "practice" : "exam";
-  document.getElementById("modeToggleBtn").textContent = state.mode === "exam" ? "Exam Mode" : "Practice Mode";
+  document.getElementById("modeToggleBtn").textContent = state.mode === "exam" ? tr.examMode : tr.practiceMode;
   if (state.started && currentExam) {
     const g = currentExam.groups[state.currentGroupIdx];
     if (g && g.audioFile) updateAudioControlsUI(g.id);
@@ -1663,7 +2160,7 @@ function startTimer() {
     if (state.elapsedSeconds % 10 === 0) saveProgress();
     if (state.secondsLeft === 0) {
       clearInterval(timerHandle);
-      alert("Time is up. Your exam will now be graded.");
+      alert(t().timeUpAlert);
       gradeTest();
     }
   }, 1000);
@@ -1671,7 +2168,7 @@ function startTimer() {
 
 function toggleTimer() {
   state.paused = !state.paused;
-  document.getElementById("pauseBtn").textContent = state.paused ? "Resume Timer" : "Pause Timer";
+  document.getElementById("pauseBtn").textContent = state.paused ? t().resumeTimer : t().pauseTimer;
   if (state.paused && audioState.playing && audioState.groupId) {
     toggleAudioPause(audioState.groupId);
   }
@@ -1688,6 +2185,7 @@ function updateTimerUI() {
 }
 
 function renderPartTabs() {
+  const tr = t();
   const groups = currentExam.groups;
   const curPart = groups[state.currentGroupIdx].part;
   const tabsHtml = [];
@@ -1702,7 +2200,7 @@ function renderPartTabs() {
         if (q.num > maxN) maxN = q.num;
       }
     }
-    tabsHtml.push(`<button class="part-tab ${curPart === p ? "active" : ""}" onclick="jumpToGroup(${firstIdx})">Part ${p} (${minN}–${maxN})</button>`);
+    tabsHtml.push(`<button class="part-tab ${curPart === p ? "active" : ""}" onclick="jumpToGroup(${firstIdx})">${tr.partWord} ${p} (${minN}–${maxN})</button>`);
   }
   document.getElementById("partTabs").innerHTML = tabsHtml.join("");
 }
@@ -1764,13 +2262,17 @@ function stripOptionPrefix(text) {
 }
 
 function renderCurrentGroup() {
+  const tr = t();
   const groups = currentExam.groups;
   const g = groups[state.currentGroupIdx];
+  const partTitle = (currentLang === "id" && PART_I18N_ID[g.part]) ? PART_I18N_ID[g.part].title : g.partTitle;
+  const directions = (currentLang === "id" && PART_I18N_ID[g.part]) ? PART_I18N_ID[g.part].dir : g.directions;
+
   let html = `<div class="sheet">`;
   html += `<div class="sheet-head">`;
-  html += `<div class="sheet-kicker">${g.section} · Part ${g.part}</div>`;
-  html += `<h2 class="sheet-title">${escapeHtml(g.partTitle)}</h2>`;
-  if (g.directions) html += `<p class="sheet-directions">${escapeHtml(g.directions)}</p>`;
+  html += `<div class="sheet-kicker">${g.section} · ${tr.partWord} ${g.part}</div>`;
+  html += `<h2 class="sheet-title">${escapeHtml(partTitle)}</h2>`;
+  if (directions) html += `<p class="sheet-directions">${escapeHtml(directions)}</p>`;
   html += `</div>`;
 
   if (g.intro) html += `<div class="intro-line">${escapeHtml(g.intro)}</div>`;
@@ -1778,20 +2280,20 @@ function renderCurrentGroup() {
   if (g.audioFile) {
     const locked = state.mode === "exam" && !state.submitted && state.playedGroups[g.id];
     const btnHtml = locked
-      ? "Played"
-      : (state.playedGroups[g.id] ? `${ICON_REPLAY} Replay` : `${ICON_PLAY} Play Audio`);
+      ? tr.played
+      : (state.playedGroups[g.id] ? `${ICON_REPLAY} ${tr.replay}` : `${ICON_PLAY} ${tr.playAudio}`);
     const durStr = fmtTime(g.audioDuration || 0);
     html += `
       <div class="audio-bar">
         <div class="audio-top">
           <button class="btn-primary" id="playBtn_${g.id}" onclick="playGroupAudio('${g.id}')" ${locked ? "disabled" : ""}>${btnHtml}</button>
-          <button class="btn-ghost" id="pauseAudioBtn_${g.id}" onclick="toggleAudioPause('${g.id}')" disabled>${ICON_PAUSE} Pause</button>
+          <button class="btn-ghost" id="pauseAudioBtn_${g.id}" onclick="toggleAudioPause('${g.id}')" disabled>${ICON_PAUSE} ${tr.pause}</button>
           <div class="audio-status" id="audioStatus_${g.id}">
-            ${locked ? "Completed in Exam Mode. Switch to Practice Mode in the top bar to replay." : "Ready. Press Play Audio to listen."}
+            ${locked ? tr.audioLocked : tr.audioReady}
           </div>
         </div>
         <div class="audio-progress-row">
-          <div class="audio-track" onclick="seekAudio('${g.id}', event)" title="Track progress (seekable in Practice Mode)">
+          <div class="audio-track" onclick="seekAudio('${g.id}', event)">
             <div class="audio-fill" id="audioFill_${g.id}"></div>
           </div>
           <div class="audio-time" id="audioTime_${g.id}">0:00 / ${durStr}</div>
@@ -1827,19 +2329,19 @@ function renderCurrentGroup() {
         <label class="${cls}" data-letter="${letter}" onclick="selectAnswer(${q.num}, '${letter}')">
           <input type="radio" name="q_${q.num}" value="${letter}" ${chosen === letter ? "checked" : ""} ${state.submitted ? "disabled" : ""} />
           <span class="opt-letter">${letter}</span>
-          <span>${cleanLabel ? escapeHtml(cleanLabel) : `Choice ${letter} (spoken in audio)`}</span>
+          <span>${cleanLabel ? escapeHtml(cleanLabel) : tr.spokenChoice(letter)}</span>
         </label>`;
     });
     html += `</div>`;
     if ((g.part === 1 || g.part === 2) && !state.submitted) {
-      html += `<div class="audio-hint">Choices are spoken aloud in the audio and highlighted as each option plays, matching the real TOEIC format.</div>`;
+      html += `<div class="audio-hint">${tr.audioHintP12}</div>`;
     }
 
     if (state.submitted) {
       const ok = chosen === q.answer;
       html += `
         <div class="explanation-box ${ok ? "" : "missed"}">
-          <strong>${ok ? "Correct" : `Missed · Your answer: ${chosen || "Blank"} · Official key: ${q.answer}`}</strong>
+          <strong>${ok ? tr.correct : tr.missedFmt(chosen || tr.blank, q.answer)}</strong>
           <div style="margin-top:4px;">${escapeHtml(q.explanation)}</div>
         </div>`;
     }
@@ -1847,23 +2349,22 @@ function renderCurrentGroup() {
   }
 
   if (state.submitted && g.transcript) {
-    html += `<div class="transcript-box"><strong>Audio Transcript</strong>${escapeHtml(g.transcript)}</div>`;
+    html += `<div class="transcript-box"><strong>${tr.audioTranscript}</strong>${escapeHtml(g.transcript)}</div>`;
   }
 
   html += `</div>`;
   document.getElementById("questionContainer").innerHTML = html;
   document.getElementById("prevBtn").disabled = state.currentGroupIdx === 0;
   document.getElementById("nextBtn").disabled = state.currentGroupIdx === groups.length - 1;
-  document.getElementById("groupIndicator").textContent = `Page ${state.currentGroupIdx + 1} of ${groups.length}`;
+  document.getElementById("groupIndicator").textContent = `${tr.pageWord} ${state.currentGroupIdx + 1} ${tr.ofWord} ${groups.length}`;
 }
 
 function confirmSubmit() {
   if (!currentExam) return;
+  const tr = t();
   const answered = Object.keys(state.answers).length;
   const total = currentExam.totalQs;
-  const msg = answered < total
-    ? `You have answered ${answered} of ${total} questions (${total - answered} blank). Submit and grade now?`
-    : `Submit all ${total} answers and view your score and explanations?`;
+  const msg = answered < total ? tr.confirmBlank(answered, total) : tr.confirmAll(total);
   if (confirm(msg)) gradeTest();
 }
 
@@ -1887,6 +2388,8 @@ function gradeTest() {
 }
 
 function renderScoreBanner() {
+  const tr = t();
+  const ex = getExamText(currentExam);
   const result = state.lastResult && state.lastResult.partStats
     ? state.lastResult
     : computeExamScore(currentExam, state.answers);
@@ -1895,9 +2398,9 @@ function renderScoreBanner() {
 
   let partRows = "";
   for (let p = 1; p <= 7; p++) {
-    const [c, t] = result.partStats[p];
-    const pct = t ? Math.round((c / t) * 100) : 0;
-    partRows += `<tr><td>Part ${p}</td><td>${c} / ${t}</td><td>${pct}%</td></tr>`;
+    const [c, tot] = result.partStats[p];
+    const pct = tot ? Math.round((c / tot) * 100) : 0;
+    partRows += `<tr><td>${tr.partWord} ${p}</td><td>${c} / ${tot}</td><td>${pct}%</td></tr>`;
   }
 
   const summaryText = [
@@ -1916,39 +2419,39 @@ function renderScoreBanner() {
   banner.innerHTML = `
     <div class="score-top">
       <div>
-        <div class="kicker">Results Summary</div>
-        <h2 style="margin:0;font-size:1.25rem;">${escapeHtml(currentExam.title)} Graded</h2>
+        <div class="kicker">${tr.resultsKicker}</div>
+        <h2 style="margin:0;font-size:1.25rem;">${escapeHtml(ex.title)} · ${tr.gradedSuffix}</h2>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn-primary" onclick="copyResults()">Copy Results for AI Tutor</button>
-        <button class="btn-ghost" onclick="goHome()">Back to All Exams</button>
+        <button class="btn-primary" onclick="copyResults()">${tr.copyAiTutor}</button>
+        <button class="btn-ghost" onclick="goHome()">${tr.backAllExams}</button>
       </div>
     </div>
     <div class="score-grid">
-      <div class="score-tile"><div class="big">${result.totalScaled}</div><div class="lbl">Est. Scaled Score / 990</div></div>
-      <div class="score-tile"><div class="big">${result.lCorrect} / ${currentExam.listeningQs}</div><div class="lbl">Listening (Est. ${result.lScaled})</div></div>
-      <div class="score-tile"><div class="big">${result.rCorrect} / ${currentExam.readingQs}</div><div class="lbl">Reading (Est. ${result.rScaled})</div></div>
-      <div class="score-tile"><div class="big">${mins}:${String(secs).padStart(2, "0")}</div><div class="lbl">Time Elapsed</div></div>
+      <div class="score-tile"><div class="big">${result.totalScaled}</div><div class="lbl">${tr.estScaledLbl}</div></div>
+      <div class="score-tile"><div class="big">${result.lCorrect} / ${currentExam.listeningQs}</div><div class="lbl">${tr.listening} (${tr.estPrefix} ${result.lScaled})</div></div>
+      <div class="score-tile"><div class="big">${result.rCorrect} / ${currentExam.readingQs}</div><div class="lbl">${tr.reading} (${tr.estPrefix} ${result.rScaled})</div></div>
+      <div class="score-tile"><div class="big">${mins}:${String(secs).padStart(2, "0")}</div><div class="lbl">${tr.timeElapsed}</div></div>
     </div>
     <table class="toeic-table">
-      <thead><tr><th>Part</th><th>Correct</th><th>Accuracy</th></tr></thead>
+      <thead><tr>${tr.scoreTableCols.map(c => `<th>${c}</th>`).join("")}</tr></thead>
       <tbody>${partRows}</tbody>
     </table>
-    <p style="font-size:0.84rem;color:var(--ink-secondary);margin:14px 0 0;">Click any red number in the Navigator to review official explanations and audio transcripts, or copy your results back into chat to update <code>mistake_log.md</code>.</p>
+    <p style="font-size:0.84rem;color:var(--ink-secondary);margin:14px 0 0;">${tr.reviewHint}</p>
   `;
 }
 
 function copyResults() {
   if (!window.__LAST_SUMMARY__) return;
   navigator.clipboard.writeText(window.__LAST_SUMMARY__).then(() => {
-    alert("Results copied. Paste them into chat to review your weak areas and log mistakes.");
+    alert(t().copiedResults);
   }).catch(() => {
-    prompt("Copy this summary:", window.__LAST_SUMMARY__);
+    prompt(t().copyPrompt, window.__LAST_SUMMARY__);
   });
 }
 
-// Initial render
-renderHome();
+initPreferences();
+rerenderActiveView();
 </script>
 </body>
 </html>
