@@ -1,0 +1,25 @@
+# Never commit raw textbooks, secrets, or local environment files
+*.pdf
+.env
+.env.*
+*.key
+*.pem
+credentials*
+secrets*
+
+# OS and editor metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+*.log
+
+# Python / Node local artifacts
+__pycache__/
+*.pyc
+.venv/
+node_modules/
