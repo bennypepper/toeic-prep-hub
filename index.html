@@ -824,7 +824,7 @@
 
   .sidebar {
     position: sticky;
-    top: 74px;
+    top: var(--header-h, 116px);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -1427,7 +1427,7 @@ function applyLangUI() {
   const hSel = document.getElementById("homeSpeedSelect");
   [0.9, 1.0, 1.1].forEach((val, idx) => {
     const vStr = val.toFixed(1);
-    if (sSel.options[idx]) sSel.options[idx].textContent = `${vStr}x ${tr.speedSuffix}`;
+    if (sSel.options[idx]) sSel.options[idx].textContent = `${vStr}x`;
     if (hSel.options[idx]) hSel.options[idx].textContent = `${vStr}x ${tr.audioSuffix}`;
   });
 
@@ -1952,6 +1952,7 @@ function enterTestView() {
   renderPartTabs();
   renderNavGrid();
   renderCurrentGroup();
+  syncHeaderOffset();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -2237,6 +2238,7 @@ function jumpToGroup(idx) {
   renderPartTabs();
   renderNavGrid();
   renderCurrentGroup();
+  syncHeaderOffset();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -2450,8 +2452,17 @@ function copyResults() {
   });
 }
 
+function syncHeaderOffset() {
+  const hdr = document.querySelector("header");
+  if (hdr) {
+    document.documentElement.style.setProperty("--header-h", `${Math.ceil(hdr.getBoundingClientRect().height) + 14}px`);
+  }
+}
+window.addEventListener("resize", syncHeaderOffset);
+
 initPreferences();
 rerenderActiveView();
+syncHeaderOffset();
 </script>
 </body>
 </html>
