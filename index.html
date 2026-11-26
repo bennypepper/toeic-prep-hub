@@ -451,7 +451,7 @@
   }
   @media (max-width: 960px) {
     .layout { grid-template-columns: 1fr; }
-    .sidebar { order: -1; position: static !important; }
+    .sidebar { position: static !important; }
     .start-screen { margin: 20px 16px; padding: 24px; }
   }
 
@@ -1519,9 +1519,6 @@ function updateAudioControlsUI(groupId, statusMsg, isLive = false) {
   if (pauseAudioBtn) {
     if (isThisGroup && audioState.playing) {
       pauseAudioBtn.innerHTML = `${ICON_PAUSE} Pause`;
-      pauseAudioBtn.disabled = false;
-    } else if (isThisGroup && audioState.paused) {
-      pauseAudioBtn.innerHTML = `${ICON_PLAY} Resume`;
       pauseAudioBtn.disabled = false;
     } else {
       pauseAudioBtn.innerHTML = `${ICON_PAUSE} Pause`;
