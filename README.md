@@ -1,6 +1,6 @@
 # TOEIC Prep Hub
 
-Interactive TOEIC Listening & Reading mock exams with local multi-speaker audio, paired with an AI-tutor-ready Markdown study library.
+Interactive TOEIC Listening & Reading mock exams with local multi-speaker audio, EN/ID interface switching, dark/light mode, and an AI-tutor-ready Markdown study library.
 
 **Live Mock Exam Hub (GitHub Pages):** https://bennypepper.github.io/toeic-prep-hub/
 
@@ -10,20 +10,22 @@ Interactive TOEIC Listening & Reading mock exams with local multi-speaker audio,
 
 ### 1. Interactive Mock Exam Center (`index.html`)
 
-Open the live GitHub Pages link (or open `index.html` locally after cloning) to practice **500 curated questions** across 3 exams with **134 Supertonic-3 ONNX MP3 audio tracks**:
+Open the live GitHub Pages link (or open `index.html` locally after cloning) to practice **900 curated questions** across 5 exams with **242 Supertonic-3 ONNX AAC-LC (`.m4a`) audio tracks** and **WebP** photographs:
 
 | Exam | Questions | Time | Audio Tracks | Format |
 | :--- | :---: | :---: | :---: | :--- |
-| **Half-Length Mock Exam** | 100 (50 L / 50 R) | 60 min | 26 MP3s | Warm-up diagnostic covering Parts 1 to 7 |
-| **TOEIC Full Mock Exam 1** | 200 (100 L / 100 R) | 120 min | 54 MP3s | Official post-2016 format (Barron's New TOEIC Exam A) |
-| **TOEIC Full Mock Exam 2** | 200 (100 L / 100 R) | 120 min | 54 MP3s | Official post-2016 format (Barron's New TOEIC Exam B) |
+| **Half-Length Mock Exam** | 100 (50 L / 50 R) | 60 min | 26 tracks | Warm-up diagnostic covering Parts 1 to 7 |
+| **TOEIC Full Mock Exam 1** | 200 (100 L / 100 R) | 120 min | 54 tracks | Post-2016 format (Barron's New TOEIC Exam A) |
+| **TOEIC Full Mock Exam 2** | 200 (100 L / 100 R) | 120 min | 54 tracks | Post-2016 format (Barron's New TOEIC Exam B) |
+| **TOEIC Full Mock Exam 3** | 200 (100 L / 100 R) | 120 min | 54 tracks | Post-2016 format (Barron's Practice Exam 1 & 2) |
+| **TOEIC Full Mock Exam 4** | 200 (100 L / 100 R) | 120 min | 54 tracks | Post-2016 format (Barron's Practice Exam 3 & 4) |
 
 Features:
-- **Homepage Dashboard:** Track exam status (Not Started, In Progress, Completed), answered counts, best scaled scores (10 to 990), and aggregated Part 1 to 7 accuracy.
+- **Homepage Dashboard:** Track exam status (Not Started, In Progress, Completed), answered counts (`X / 900`), best scaled scores (10 to 990), and aggregated Part 1 to 7 accuracy.
+- **EN / ID Toggle & Dark / Light Mode:** Switch the UI cleanly between English and Bahasa Indonesia (while keeping TOEIC test questions in English) and choose between warm-paper Light Mode or comfortable warm-charcoal Dark Mode.
 - **Exam Mode & Practice Mode:** Play tracks once with Pause/Resume in Exam Mode, or replay and seek freely in Practice Mode. Playback speed supports 0.9x, 1.0x, and 1.1x.
 - **Automatic Local Autosave:** Answers, remaining time, and graded results persist in browser `localStorage` so you can pause a 2-hour session and resume later.
-- **Full Review Mode:** Unlock official explanations and complete audio transcripts immediately after submitting.
-- **AI Tutor Export:** Click **Copy Results for AI Tutor** after grading to paste your score breakdown and missed questions directly into an AI coding agent to log mistakes and drill weak topics.
+- **Full Review Mode & AI Tutor Export:** Unlock official explanations and complete audio transcripts on submission, and click **Copy Results for AI Tutor** to log mistakes and drill weak topics.
 
 ### 2. AI Tutor & Study Library (`AGENTS.md`, `study/`, `markdown/`)
 
@@ -46,7 +48,7 @@ Clone this repo and open it in any agentic platform (Antigravity, Claude Code, C
 ### Option A: Practice Immediately in Your Browser
 1. Open **https://bennypepper.github.io/toeic-prep-hub/**.
 2. Click **Test Audio** in the top bar to check your headphones or speakers.
-3. Start with the **Half-Length Mock Exam** (60 min) as a diagnostic, then take **Full Mock Exam 1** and **Full Mock Exam 2**.
+3. Start with the **Half-Length Mock Exam** (60 min) as a diagnostic, then work through **Full Mock Exams 1 to 4**.
 
 ### Option B: Clone Locally + Study With an AI Agent
 ```bash
@@ -54,7 +56,7 @@ git clone https://github.com/bennypepper/toeic-prep-hub.git
 cd toeic-prep-hub
 ```
 1. Open `index.html` directly in your browser (or run `python -m http.server 8000` and open `http://localhost:8000`).
-2. Open the folder in your AI agent platform and say: *"Start my 15-question Part 5 diagnostic drill"* or paste the output of **Copy Results for AI Tutor** from any completed mock exam.
+2. Open the folder in your AI agent platform and paste the output of **Copy Results for AI Tutor** from any completed mock exam.
 
 ---
 
@@ -62,11 +64,13 @@ cd toeic-prep-hub
 
 ```text
 toeic-prep-hub/
-├── index.html          # Unified 3-exam web app (homepage + exam engine)
+├── index.html          # Unified 5-exam web app (900 Qs, WebP images, EN/ID, Dark/Light)
 ├── audio/
-│   ├── half_100q/      # 26 MP3 tracks for Half-Length Mock Exam
-│   ├── exam_1/         # 54 MP3 tracks for Full Mock Exam 1
-│   └── exam_2/         # 54 MP3 tracks for Full Mock Exam 2
+│   ├── half_100q/      # 26 AAC-LC .m4a tracks (Half-Length Mock Exam)
+│   ├── exam_1/         # 54 AAC-LC .m4a tracks (Full Mock Exam 1)
+│   ├── exam_2/         # 54 AAC-LC .m4a tracks (Full Mock Exam 2)
+│   ├── exam_3/         # 54 AAC-LC .m4a tracks (Full Mock Exam 3)
+│   └── exam_4/         # 54 AAC-LC .m4a tracks (Full Mock Exam 4)
 ├── study/
 │   ├── 4_day_plan.md   # Intensive prep schedule
 │   └── mistake_log.md  # Personal score & error tracker template
