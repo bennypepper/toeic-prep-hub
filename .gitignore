@@ -1,5 +1,6 @@
 # Never commit raw textbooks, secrets, or local environment files
 *.pdf
+*.PDF
 .env
 .env.*
 *.key

@@ -80,3 +80,17 @@ toeic-prep-hub/
 ├── AGENTS.md           # AI Tutor system instructions
 └── README.md
 ```
+
+---
+
+## Sources & Attribution
+
+This study repository is compiled strictly for personal, non-commercial TOEIC exam preparation. All original test questions, reading passages, photographs, and explanations belong to their respective authors and publishers:
+
+- **Barron's TOEIC Practice Exams** & **Barron's New TOEIC Practice Exams (Exams A & B)** by Dr. Lin Lougheed (Barron's Educational Series) - primary source for Full Mock Exams 1 to 5 and Half-Length Mock Exam (`markdown/01_barrons_practice_exams/`).
+- **Collins Skills for the TOEIC Test: Listening and Reading** (HarperCollins Publishers) - Part 1 to 7 strategy guides, *Get It Right* trap patterns, and drills (`markdown/02_collins_skills_toeic/`).
+- **IELTS, TOEFL, and TOEIC Vocabulary 2020 (2nd Edition)** (College Exam Preparation) - high-frequency exam vocabulary reference (`markdown/03_vocabulary_2020/`).
+- **Barron's How to Prepare for the TOEIC Test (4th Edition)** by Dr. Lin Lougheed (Barron's Educational Series) - targeted grammar drills and additional Model Tests (`markdown/04_barrons_toeic_test/`).
+- **TOEIC Post-2016 Format Reference** - section structure (`6 / 25 / 39 / 30 / 30 / 16 / 54`) and 10 to 990 scaled score framework based on ETS TOEIC Listening & Reading specifications.
+- **Audio Synthesis** - local multi-speaker listening tracks synthesized with [Supertonic-3 ONNX](https://huggingface.co/Supertone/supertonic) and encoded with FFmpeg AAC-LC (`.m4a`).
+- **Repository Policy** - raw textbook `.pdf` files are strictly excluded via `.gitignore` and never committed.
