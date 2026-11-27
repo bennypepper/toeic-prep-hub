@@ -551,29 +551,29 @@
 
   .exam-list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 14px;
     margin-bottom: 24px;
-  }
-  @media (max-width: 860px) {
-    .exam-list { grid-template-columns: 1fr; }
   }
   .exam-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 20px 22px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 14px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px 24px;
+    align-items: center;
     transition: border-color 0.14s ease;
   }
   .exam-card:hover { border-color: var(--border-strong); }
+  @media (max-width: 760px) {
+    .exam-card { grid-template-columns: 1fr; padding: 18px 20px; }
+  }
   .exam-card-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 6px;
@@ -660,11 +660,19 @@
   .exam-actions {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
     gap: 8px;
-    flex-wrap: wrap;
-    padding-top: 2px;
+    flex-wrap: nowrap;
   }
-  .exam-actions button { flex: 1 1 120px; justify-content: center; }
+  .exam-actions button {
+    white-space: nowrap;
+    justify-content: center;
+  }
+  @media (max-width: 760px) {
+    .exam-actions { justify-content: flex-start; flex-wrap: wrap; }
+    .exam-actions button { flex: 1 1 130px; }
+  }
 
   .mastery-panel {
     background: var(--surface);
@@ -2467,8 +2475,8 @@ function renderHome() {
           <div class="progress-track"><div class="progress-fill done" style="width:${result.accuracy}%"></div></div>
         </div>`;
       actionsHtml = `
-        <button class="btn-primary" onclick="openExamReview('${exam.id}')">${tr.reviewResults}</button>
-        <button class="btn-ghost" onclick="openExamSetup('${exam.id}')">${tr.retakeExam}</button>`;
+        <button class="btn-ghost" onclick="openExamSetup('${exam.id}')">${tr.retakeExam}</button>
+        <button class="btn-primary" onclick="openExamReview('${exam.id}')">${tr.reviewResults}</button>`;
     } else if (hasProgress) {
       const pct = Math.round((answered / exam.totalQs) * 100);
       statusBadge = `<span class="status-pill progress">${tr.statusInProgress}</span>`;
@@ -2481,8 +2489,8 @@ function renderHome() {
           <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
         </div>`;
       actionsHtml = `
-        <button class="btn-primary" onclick="resumeExamDirectly('${exam.id}')">${tr.resumeExam}</button>
-        <button class="btn-ghost" onclick="openExamSetup('${exam.id}')">${tr.optionsReset}</button>`;
+        <button class="btn-ghost" onclick="openExamSetup('${exam.id}')">${tr.optionsReset}</button>
+        <button class="btn-primary" onclick="resumeExamDirectly('${exam.id}')">${tr.resumeExam}</button>`;
     } else {
       const prevBest = saved && saved.bestScore
         ? `<div class="exam-progress-block"><div class="progress-row"><span>${tr.prevBest}: <strong>${saved.bestScore} / 990</strong></span></div></div>`
