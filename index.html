@@ -810,6 +810,156 @@
     color: var(--ink-secondary);
     font-size: 0.86rem;
   }
+
+  .view-switch {
+    display: inline-flex;
+    align-items: center;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    padding: 2px;
+  }
+  .view-btn {
+    border: none;
+    background: transparent;
+    color: var(--ink-secondary);
+    padding: 4px 10px;
+    font-size: 0.77rem;
+    font-weight: 600;
+    border-radius: 5px;
+  }
+  .view-btn:hover:not(.active) { color: var(--ink); }
+  .view-btn.active {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* Spotlight Onboarding */
+  .onboard-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+  }
+  .onboard-shield {
+    position: fixed;
+    background: transparent;
+    pointer-events: auto;
+    z-index: 201;
+  }
+  .onboard-backdrop-full {
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 11, 10, 0.68);
+    pointer-events: auto;
+    z-index: 201;
+  }
+  .onboard-spotlight {
+    position: fixed;
+    border-radius: 10px;
+    pointer-events: none;
+    z-index: 202;
+    box-shadow: 0 0 0 9999px rgba(12, 11, 10, 0.68), 0 0 0 2.5px #ffffff, 0 0 24px rgba(255, 255, 255, 0.22);
+    transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+  }
+  .onboard-card {
+    position: fixed;
+    z-index: 210;
+    pointer-events: auto;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 18px 20px;
+    width: min(350px, calc(100vw - 28px));
+    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.32);
+  }
+  .onboard-card.centered {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%);
+    width: min(560px, calc(100vw - 28px));
+    padding: 24px 26px;
+  }
+  .onboard-step-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-tertiary);
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .onboard-title {
+    margin: 0 0 6px;
+    font-size: 1.04rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+  }
+  .onboard-desc {
+    margin: 0 0 14px;
+    font-size: 0.84rem;
+    color: var(--ink-secondary);
+    line-height: 1.55;
+  }
+  .onboard-choices {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 560px) {
+    .onboard-choices { grid-template-columns: 1fr; }
+  }
+  .onboard-choice {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 6px;
+    padding: 15px 16px;
+    border-radius: 10px;
+    background: var(--surface-subtle);
+    border: 1.5px solid var(--border-strong);
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color 0.14s ease, background-color 0.14s ease;
+  }
+  .onboard-choice:hover {
+    border-color: var(--accent);
+    background: var(--surface-muted);
+  }
+  .onboard-choice-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .onboard-choice-desc {
+    font-size: 0.79rem;
+    color: var(--ink-secondary);
+    line-height: 1.48;
+    font-weight: 400;
+  }
+  .onboard-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 4px;
+  }
+  .onboard-key-hint {
+    font-size: 0.74rem;
+    color: var(--ink-tertiary);
+  }
+  .onboard-btns {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
     color: var(--ink-secondary);
   }
   code {
@@ -1302,7 +1452,7 @@
       </div>
 
       <div class="global-toggles">
-        <div class="lang-switch" role="group" aria-label="Language">
+        <div class="lang-switch" id="langSwitchWrap" role="group" aria-label="Language">
           <button type="button" class="lang-btn" id="langBtnEn" onclick="setLang('en')">EN</button>
           <button type="button" class="lang-btn" id="langBtnId" onclick="setLang('id')">ID</button>
         </div>
@@ -1350,6 +1500,7 @@
   <div class="home-utility">
     <span id="homeUtilityText"></span>
     <div class="utility-actions">
+      <button class="btn-subtle" id="replayTourBtn" onclick="startOnboarding(true)"></button>
       <button class="btn-subtle" id="copyOverallBtn" onclick="exportAllResults()"></button>
       <button class="btn-ghost" id="exportBackupBtn" onclick="exportBackupJson()"></button>
       <button class="btn-ghost" id="importBackupBtn" onclick="triggerImportBackup()"></button>
@@ -1358,6 +1509,17 @@
   </div>
 
   <footer class="home-attribution" id="homeAttribution"></footer>
+</div>
+
+<!-- SPOTLIGHT ONBOARDING OVERLAY -->
+<div id="onboardOverlay" class="onboard-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="onboardTitle">
+  <div id="onboardBackdropFull" class="onboard-backdrop-full hidden" onclick="skipOnboarding()"></div>
+  <div id="onboardShieldTop" class="onboard-shield hidden" onclick="skipOnboarding()"></div>
+  <div id="onboardShieldBottom" class="onboard-shield hidden" onclick="skipOnboarding()"></div>
+  <div id="onboardShieldLeft" class="onboard-shield hidden" onclick="skipOnboarding()"></div>
+  <div id="onboardShieldRight" class="onboard-shield hidden" onclick="skipOnboarding()"></div>
+  <div id="onboardSpotlight" class="onboard-spotlight hidden"></div>
+  <div id="onboardCard" class="onboard-card"></div>
 </div>
 
 <!-- VIEW 2: EXAM SETUP / BRIEFING -->
@@ -1604,6 +1766,23 @@ const I18N = {
     newDrillBtn: "Another Drill",
     drillLabel: "Quick Drill",
     mistakeRetryLabel: "Mistake Retry",
+    viewMinimal: "Minimal",
+    viewFull: "Full",
+    replayTour: "Quick Tour",
+    obStep: (i, n) => `Step ${i} of ${n}`,
+    obKeyHint: "Press any key to skip",
+    obSkip: "Skip",
+    obNext: "Next",
+    obLangTitle: "Switch Interface Language",
+    obLangDesc: "Toggle the interface between English and Bahasa Indonesia anytime. Try clicking EN or ID right now; actual TOEIC test questions stay in English.",
+    obThemeTitle: "Light & Dark Reading Mode",
+    obThemeDesc: "Switch between warm-paper Light Mode and comfortable low-glare Dark Mode. Click the highlighted icon to try it out.",
+    obLayoutTitle: "Choose Your Homepage View",
+    obLayoutDesc: "Pick the layout that feels best right now. You can switch between Minimal and Full view anytime with one click.",
+    obMinimalTitle: "Minimalist View",
+    obMinimalDesc: "Calm, distraction-free list of all 6 mock exams. Best if you want to start practicing immediately.",
+    obFullTitle: "Full Study Cockpit",
+    obFullDesc: "Adds Quick Drill by Part, Mistake Bank, Target Score & Countdown, Mastery charts, and Backup tools.",
     attributionHtml: `<div><strong>Sources &amp; Attribution:</strong> Practice exam questions, passages, photos, and explanations are adapted from <em>Barron's TOEIC Practice Exams</em> and <em>Barron's New TOEIC Practice Exams</em> by Dr. Lin Lougheed (Barron's Educational Series), aligned to the ETS post-2016 TOEIC Listening &amp; Reading format. Listening audio is synthesized locally with Supertonic-3 ONNX. Compiled strictly for personal, non-commercial study.</div><div><a href="https://github.com/bennypepper/toeic-prep-hub" target="_blank" rel="noopener noreferrer">github.com/bennypepper/toeic-prep-hub</a></div>`
   },
   id: {
@@ -1765,6 +1944,23 @@ const I18N = {
     newDrillBtn: "Latihan Lagi",
     drillLabel: "Latihan Cepat",
     mistakeRetryLabel: "Ulang Kesalahan",
+    viewMinimal: "Minimalis",
+    viewFull: "Lengkap",
+    replayTour: "Panduan Singkat",
+    obStep: (i, n) => `Langkah ${i} dari ${n}`,
+    obKeyHint: "Tekan tombol apa saja untuk lewati",
+    obSkip: "Lewati",
+    obNext: "Lanjut",
+    obLangTitle: "Ganti Bahasa Antarmuka",
+    obLangDesc: "Ubah bahasa menu antara Bahasa Inggris (EN) dan Bahasa Indonesia (ID) kapan saja. Coba klik tombol di atas; soal TOEIC tetap dalam Bahasa Inggris.",
+    obThemeTitle: "Mode Terang & Mode Gelap",
+    obThemeDesc: "Pilih tampilan kertas hangat (Terang) atau Mode Gelap yang nyaman di mata. Klik ikon yang disorot untuk langsung mencoba.",
+    obLayoutTitle: "Pilih Tampilan Beranda",
+    obLayoutDesc: "Pilih tampilan yang paling nyaman untuk Anda. Anda bisa beralih antara Minimalis dan Lengkap kapan saja dengan satu klik.",
+    obMinimalTitle: "Tampilan Minimalis",
+    obMinimalDesc: "Daftar 6 paket simulasi yang tenang dan bersih tanpa panel tambahan. Cocok untuk langsung mulai latihan.",
+    obFullTitle: "Mode Lengkap (Study Cockpit)",
+    obFullDesc: "Menampilkan Latihan Cepat per Bagian, Bank Kesalahan, Target Skor & Hitung Mundur, grafik Akurasi, dan Backup.",
     attributionHtml: `<div><strong>Sumber &amp; Atribusi:</strong> Soal latihan, bacaan, foto, dan pembahasan diadaptasi dari <em>Barron's TOEIC Practice Exams</em> dan <em>Barron's New TOEIC Practice Exams</em> karya Dr. Lin Lougheed (Barron's Educational Series), disesuaikan dengan format resmi ETS TOEIC pasca-2016. Audio listening disintesis secara lokal menggunakan Supertonic-3 ONNX. Disusun khusus untuk latihan mandiri non-komersial.</div><div><a href="https://github.com/bennypepper/toeic-prep-hub" target="_blank" rel="noopener noreferrer">github.com/bennypepper/toeic-prep-hub</a></div>`
   }
 };
@@ -1857,14 +2053,39 @@ function getExamText(exam) {
   return exam;
 }
 
+let currentLayout = "minimal";
+let onboardActive = false;
+let onboardStep = 0;
+
 function initPreferences() {
   try {
     const savedLang = localStorage.getItem("toeic_hub_lang");
     if (savedLang === "id" || savedLang === "en") currentLang = savedLang;
+    const savedLayout = localStorage.getItem("toeic_hub_layout");
+    if (savedLayout === "minimal" || savedLayout === "full") {
+      currentLayout = savedLayout;
+    } else if (EXAMS.some(e => !!loadSavedFor(e))) {
+      // Returning user with saved progress before layout toggle existed -> preserve full view
+      currentLayout = "full";
+    } else {
+      currentLayout = "minimal";
+    }
   } catch (e) {}
   currentTheme = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
   applyThemeUI();
   applyLangUI();
+}
+
+function setLayout(mode) {
+  if (mode !== "minimal" && mode !== "full") return;
+  currentLayout = mode;
+  try { localStorage.setItem("toeic_hub_layout", mode); } catch (e) {}
+  if (currentLayout === "minimal") {
+    goalEditorOpen = false;
+    mistakeDrawerOpen = false;
+    homeFilter = "all";
+  }
+  renderHome();
 }
 
 function setLang(lang) {
@@ -1873,6 +2094,10 @@ function setLang(lang) {
   try { localStorage.setItem("toeic_hub_lang", lang); } catch (e) {}
   applyLangUI();
   rerenderActiveView();
+  if (onboardActive) {
+    renderOnboardingStep();
+    requestAnimationFrame(positionOnboardSpotlight);
+  }
 }
 
 function toggleTheme() {
@@ -1884,6 +2109,9 @@ function toggleTheme() {
   }
   try { localStorage.setItem("toeic_hub_theme", currentTheme); } catch (e) {}
   applyThemeUI();
+  if (onboardActive) {
+    requestAnimationFrame(positionOnboardSpotlight);
+  }
 }
 
 function applyThemeUI() {
@@ -1924,6 +2152,7 @@ function applyLangUI() {
   document.getElementById("availExamsHeading").textContent = tr.availExams;
   document.getElementById("availExamsSub").textContent = tr.availSub;
   document.getElementById("homeUtilityText").innerHTML = tr.utilityText;
+  document.getElementById("replayTourBtn").textContent = tr.replayTour;
   document.getElementById("copyOverallBtn").textContent = tr.copyOverall;
   document.getElementById("exportBackupBtn").textContent = tr.exportBackup;
   document.getElementById("importBackupBtn").textContent = tr.importBackup;
@@ -2284,30 +2513,37 @@ function renderHome() {
     return { bucket, html };
   });
 
-  // Goal Pill & Editor
+  // View Switcher + Goal Pill & Editor
+  const isMinimal = currentLayout === "minimal";
   const goalPillWrap = document.getElementById("goalPillWrap");
-  let goalHtml = "";
+  let goalHtml = `
+    <div class="view-switch" role="group" aria-label="Homepage view">
+      <button type="button" class="view-btn ${isMinimal ? "active" : ""}" id="viewBtnMinimal" onclick="setLayout('minimal')">${tr.viewMinimal}</button>
+      <button type="button" class="view-btn ${!isMinimal ? "active" : ""}" id="viewBtnFull" onclick="setLayout('full')">${tr.viewFull}</button>
+    </div>`;
   let goalSubNote = "";
-  if (goal.targetScore) {
-    const reached = bestScaledOverall !== null && bestScaledOverall >= goal.targetScore;
-    if (bestScaledOverall !== null) {
-      goalSubNote = reached ? tr.goalReached : tr.ptsToGoal(goal.targetScore - bestScaledOverall);
+  if (!isMinimal) {
+    if (goal.targetScore) {
+      const reached = bestScaledOverall !== null && bestScaledOverall >= goal.targetScore;
+      if (bestScaledOverall !== null) {
+        goalSubNote = reached ? tr.goalReached : tr.ptsToGoal(goal.targetScore - bestScaledOverall);
+      }
+      goalHtml += `<span class="goal-badge ${reached ? "reached" : ""}">${tr.targetWord}: <strong>${goal.targetScore} / 990</strong>${goalSubNote ? ` · ${goalSubNote}` : ""}</span>`;
     }
-    goalHtml += `<span class="goal-badge ${reached ? "reached" : ""}">${tr.targetWord}: <strong>${goal.targetScore} / 990</strong>${goalSubNote ? ` · ${goalSubNote}` : ""}</span>`;
+    if (goal.testDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tDate = new Date(goal.testDate + "T00:00:00");
+      const diffDays = Math.ceil((tDate - today) / 86400000);
+      const dayStr = diffDays >= 0 ? tr.daysLeft(diffDays) : tr.datePassed;
+      goalHtml += `<span class="goal-badge"><strong>${dayStr}</strong> · ${fmtDate(goal.testDate + "T00:00:00")}</span>`;
+    }
+    goalHtml += `<button class="btn-ghost" onclick="toggleGoalEditor()">${(goal.targetScore || goal.testDate) ? tr.editGoal : tr.setGoal}</button>`;
   }
-  if (goal.testDate) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tDate = new Date(goal.testDate + "T00:00:00");
-    const diffDays = Math.ceil((tDate - today) / 86400000);
-    const dayStr = diffDays >= 0 ? tr.daysLeft(diffDays) : tr.datePassed;
-    goalHtml += `<span class="goal-badge"><strong>${dayStr}</strong> · ${fmtDate(goal.testDate + "T00:00:00")}</span>`;
-  }
-  goalHtml += `<button class="btn-ghost" onclick="toggleGoalEditor()">${(goal.targetScore || goal.testDate) ? tr.editGoal : tr.setGoal}</button>`;
   goalPillWrap.innerHTML = goalHtml;
 
   const goalEditor = document.getElementById("goalEditor");
-  if (goalEditorOpen) {
+  if (!isMinimal && goalEditorOpen) {
     goalEditor.innerHTML = `
       <label class="goal-field">
         <span>${tr.targetScoreLbl}</span>
@@ -2548,11 +2784,22 @@ function renderHome() {
     ["not_started", `${tr.filterNotStarted} (${notStartedCount})`],
     ["completed", `${tr.filterCompleted} (${completedCount})`]
   ];
-  document.getElementById("examFilterPills").innerHTML = filterDefs.map(([key, label]) =>
+  const filterPillsEl = document.getElementById("examFilterPills");
+  filterPillsEl.innerHTML = filterDefs.map(([key, label]) =>
     `<button type="button" class="filter-pill ${homeFilter === key ? "active" : ""}" onclick="setHomeFilter('${key}')">${label}</button>`
   ).join("");
 
-  const visibleCards = examCardsMeta.filter(c => homeFilter === "all" || c.bucket === homeFilter).map(c => c.html);
+  // Toggle Full-only vs Minimalist sections cleanly
+  smartBanner.classList.toggle("hidden", isMinimal);
+  if (isMinimal) masteryPanel.classList.add("hidden");
+  document.getElementById("studyToolsRow").classList.toggle("hidden", isMinimal);
+  if (isMinimal) drawer.classList.add("hidden");
+  filterPillsEl.classList.toggle("hidden", isMinimal);
+  document.getElementById("exportBackupBtn").classList.toggle("hidden", isMinimal);
+  document.getElementById("importBackupBtn").classList.toggle("hidden", isMinimal);
+
+  const activeFilter = isMinimal ? "all" : homeFilter;
+  const visibleCards = examCardsMeta.filter(c => activeFilter === "all" || c.bucket === activeFilter).map(c => c.html);
   document.getElementById("examCardList").innerHTML = visibleCards.length
     ? visibleCards.join("")
     : `<div class="home-empty-filter">${tr.noFilterMatch}</div>`;
@@ -3624,12 +3871,192 @@ function syncHeaderOffset() {
   if (hdr) {
     document.documentElement.style.setProperty("--header-h", `${Math.ceil(hdr.getBoundingClientRect().height) + 14}px`);
   }
+  if (onboardActive) positionOnboardSpotlight();
 }
 window.addEventListener("resize", syncHeaderOffset);
+
+/* ==================== FIRST-RUN SPOTLIGHT ONBOARDING ==================== */
+function shouldRunOnboarding() {
+  try {
+    if (localStorage.getItem("toeic_hub_onboarded")) return false;
+    if (localStorage.getItem("toeic_hub_layout")) return false;
+    if (EXAMS.some(e => !!loadSavedFor(e))) return false;
+    return currentView === "home";
+  } catch (e) {
+    return false;
+  }
+}
+
+function startOnboarding(force = false) {
+  if (!force && !shouldRunOnboarding()) return;
+  if (currentView !== "home") return;
+  onboardActive = true;
+  onboardStep = 0;
+  document.getElementById("onboardOverlay").classList.remove("hidden");
+  window.addEventListener("keydown", onOnboardKeydown, true);
+  renderOnboardingStep();
+  requestAnimationFrame(positionOnboardSpotlight);
+}
+
+function onOnboardKeydown(evt) {
+  if (!onboardActive) return;
+  const ignore = new Set(["Shift", "Control", "Alt", "Meta", "CapsLock", "Tab"]);
+  if (ignore.has(evt.key)) return;
+  evt.preventDefault();
+  skipOnboarding();
+}
+
+function skipOnboarding() {
+  if (!onboardActive) return;
+  onboardActive = false;
+  window.removeEventListener("keydown", onOnboardKeydown, true);
+  document.getElementById("onboardOverlay").classList.add("hidden");
+  try {
+    localStorage.setItem("toeic_hub_onboarded", "1");
+    if (!localStorage.getItem("toeic_hub_layout")) {
+      localStorage.setItem("toeic_hub_layout", currentLayout);
+    }
+  } catch (e) {}
+}
+
+function nextOnboardingStep() {
+  if (!onboardActive) return;
+  onboardStep++;
+  if (onboardStep > 2) {
+    skipOnboarding();
+    return;
+  }
+  renderOnboardingStep();
+  requestAnimationFrame(positionOnboardSpotlight);
+}
+
+function chooseOnboardingLayout(mode) {
+  setLayout(mode);
+  skipOnboarding();
+}
+
+function getOnboardTargetEl() {
+  if (onboardStep === 0) return document.getElementById("langSwitchWrap");
+  if (onboardStep === 1) return document.getElementById("themeToggleBtn");
+  return null;
+}
+
+function positionOnboardSpotlight() {
+  if (!onboardActive) return;
+  const target = getOnboardTargetEl();
+  const spot = document.getElementById("onboardSpotlight");
+  const fullBg = document.getElementById("onboardBackdropFull");
+  const sTop = document.getElementById("onboardShieldTop");
+  const sBot = document.getElementById("onboardShieldBottom");
+  const sLeft = document.getElementById("onboardShieldLeft");
+  const sRight = document.getElementById("onboardShieldRight");
+  const card = document.getElementById("onboardCard");
+
+  if (!target) {
+    spot.classList.add("hidden");
+    sTop.classList.add("hidden");
+    sBot.classList.add("hidden");
+    sLeft.classList.add("hidden");
+    sRight.classList.add("hidden");
+    fullBg.classList.remove("hidden");
+    card.classList.add("centered");
+    card.style.top = "";
+    card.style.left = "";
+    return;
+  }
+
+  fullBg.classList.add("hidden");
+  card.classList.remove("centered");
+  const r = target.getBoundingClientRect();
+  const pad = 6;
+  const top = Math.max(2, r.top - pad);
+  const left = Math.max(2, r.left - pad);
+  const width = r.width + pad * 2;
+  const height = r.height + pad * 2;
+  const bottom = top + height;
+  const right = left + width;
+
+  spot.style.top = `${top}px`;
+  spot.style.left = `${left}px`;
+  spot.style.width = `${width}px`;
+  spot.style.height = `${height}px`;
+  spot.classList.remove("hidden");
+
+  // 4 shields surround the cutout hole so clicking the highlighted button works live while clicking anywhere else skips!
+  sTop.style.cssText = `top:0;left:0;right:0;height:${top}px;`;
+  sBot.style.cssText = `top:${bottom}px;left:0;right:0;bottom:0;`;
+  sLeft.style.cssText = `top:${top}px;left:0;width:${left}px;height:${height}px;`;
+  sRight.style.cssText = `top:${top}px;left:${right}px;right:0;height:${height}px;`;
+  sTop.classList.remove("hidden");
+  sBot.classList.remove("hidden");
+  sLeft.classList.remove("hidden");
+  sRight.classList.remove("hidden");
+
+  const cardW = card.offsetWidth || 340;
+  const cardTop = bottom + 14;
+  let cardLeft = right - cardW;
+  cardLeft = Math.max(14, Math.min(cardLeft, window.innerWidth - cardW - 14));
+  card.style.top = `${cardTop}px`;
+  card.style.left = `${cardLeft}px`;
+}
+
+function renderOnboardingStep() {
+  const tr = t();
+  const card = document.getElementById("onboardCard");
+  if (onboardStep === 0) {
+    card.innerHTML = `
+      <div class="onboard-step-tag"><span>${tr.obStep(1, 3)}</span></div>
+      <h3 class="onboard-title" id="onboardTitle">${tr.obLangTitle}</h3>
+      <p class="onboard-desc">${tr.obLangDesc}</p>
+      <div class="onboard-footer">
+        <span class="onboard-key-hint">${tr.obKeyHint}</span>
+        <div class="onboard-btns">
+          <button type="button" class="btn-subtle" onclick="skipOnboarding()">${tr.obSkip}</button>
+          <button type="button" class="btn-primary" onclick="nextOnboardingStep()">${tr.obNext}</button>
+        </div>
+      </div>`;
+  } else if (onboardStep === 1) {
+    card.innerHTML = `
+      <div class="onboard-step-tag"><span>${tr.obStep(2, 3)}</span></div>
+      <h3 class="onboard-title" id="onboardTitle">${tr.obThemeTitle}</h3>
+      <p class="onboard-desc">${tr.obThemeDesc}</p>
+      <div class="onboard-footer">
+        <span class="onboard-key-hint">${tr.obKeyHint}</span>
+        <div class="onboard-btns">
+          <button type="button" class="btn-subtle" onclick="skipOnboarding()">${tr.obSkip}</button>
+          <button type="button" class="btn-primary" onclick="nextOnboardingStep()">${tr.obNext}</button>
+        </div>
+      </div>`;
+  } else {
+    card.innerHTML = `
+      <div class="onboard-step-tag"><span>${tr.obStep(3, 3)}</span></div>
+      <h3 class="onboard-title" id="onboardTitle">${tr.obLayoutTitle}</h3>
+      <p class="onboard-desc">${tr.obLayoutDesc}</p>
+      <div class="onboard-choices">
+        <button type="button" class="onboard-choice" id="obChoiceMinimal" onclick="chooseOnboardingLayout('minimal')">
+          <span class="onboard-choice-title">${tr.obMinimalTitle}</span>
+          <span class="onboard-choice-desc">${tr.obMinimalDesc}</span>
+        </button>
+        <button type="button" class="onboard-choice" id="obChoiceFull" onclick="chooseOnboardingLayout('full')">
+          <span class="onboard-choice-title">${tr.obFullTitle}</span>
+          <span class="onboard-choice-desc">${tr.obFullDesc}</span>
+        </button>
+      </div>
+      <div class="onboard-footer">
+        <span class="onboard-key-hint">${tr.obKeyHint}</span>
+        <div class="onboard-btns">
+          <button type="button" class="btn-subtle" onclick="skipOnboarding()">${tr.obSkip}</button>
+        </div>
+      </div>`;
+  }
+}
 
 initPreferences();
 rerenderActiveView();
 syncHeaderOffset();
+if (shouldRunOnboarding()) {
+  startOnboarding(false);
+}
 </script>
 </body>
 </html>
