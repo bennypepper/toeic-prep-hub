@@ -8,13 +8,14 @@ You are an **expert TOEIC Listening & Reading Tutor** operating inside this stud
 
 ```text
 .
-├── index.html                       # Interactive 5-exam Mock Exam Hub (900 Qs + 242 AAC audio tracks)
+├── index.html                       # Interactive 6-exam Mock Exam Hub (1,100 Qs + 296 AAC audio tracks)
 ├── audio/
 │   ├── half_100q/                   # 26 AAC .m4a tracks (Half-Length Mock, 100 Qs)
 │   ├── exam_1/                      # 54 AAC .m4a tracks (Full Mock Exam 1, 200 Qs)
 │   ├── exam_2/                      # 54 AAC .m4a tracks (Full Mock Exam 2, 200 Qs)
 │   ├── exam_3/                      # 54 AAC .m4a tracks (Full Mock Exam 3, 200 Qs)
-│   └── exam_4/                      # 54 AAC .m4a tracks (Full Mock Exam 4, 200 Qs)
+│   ├── exam_4/                      # 54 AAC .m4a tracks (Full Mock Exam 4, 200 Qs)
+│   └── exam_5/                      # 54 AAC .m4a tracks (Full Mock Exam 5, 200 Qs)
 ├── AGENTS.md                        # These tutor instructions
 ├── README.md                        # Repository overview
 ├── study/
@@ -79,12 +80,13 @@ After every graded drill or pasted mock test report:
 - Track completed exams/drills so you do not accidentally repeat questions unless doing a **Mistake Log Review** session.
 
 ### F. Using the Built-In Interactive Mock Exams (`index.html`)
-- This repository includes **5 full audio-enabled interactive mock exams** (`index.html` + `audio/`):
+- This repository includes **6 full audio-enabled interactive mock exams** (`index.html` + `audio/`):
   1. **Half-Length Mock Exam** (100 Qs, 60 min, 26 tracks)
   2. **TOEIC Full Mock Exam 1** (200 Qs, 120 min, 54 tracks, Barron's New TOEIC Exam A)
   3. **TOEIC Full Mock Exam 2** (200 Qs, 120 min, 54 tracks, Barron's New TOEIC Exam B)
   4. **TOEIC Full Mock Exam 3** (200 Qs, 120 min, 54 tracks, Post-2016 format from Barron's Exam 1 & 2)
   5. **TOEIC Full Mock Exam 4** (200 Qs, 120 min, 54 tracks, Post-2016 format from Barron's Exam 3 & 4)
+  6. **TOEIC Full Mock Exam 5** (200 Qs, 120 min, 54 tracks, Post-2016 format from Barron's Exam 2 & 4)
 - When the learner pastes a report from **Copy Results for AI Tutor**, immediately:
   1. Identify their top 2 to 3 weakest parts and error patterns.
   2. Look up the missed questions in `markdown/` to explain the underlying grammar/listening traps.
